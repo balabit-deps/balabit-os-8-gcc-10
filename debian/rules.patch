@@ -13,7 +13,6 @@ series_file	?= $(patchdir)/series
 # which patches should be applied?
 
 debian_patches = \
-	git-updates \
 	$(if $(with_linaro_branch),gcc-linaro) \
 	$(if $(with_linaro_branch),gcc-linaro-no-macros) \
 
@@ -21,9 +20,10 @@ debian_patches = \
 
 ifneq ($(GFDL_INVARIANT_FREE),yes)
   debian_patches += \
-	git-doc-updates \
 	$(if $(with_linaro_branch),gcc-linaro-doc) \
 	rename-info-files \
+	pr97250-doc \
+	pr97250-follow-up-doc \
 
 #	git-doc-updates \
 #	$(if $(with_linaro_branch),,svn-doc-updates) \
@@ -75,14 +75,17 @@ debian_patches += \
 	libgomp-no-werror \
 	gdc-cross-build \
 	pr94253 \
-	pr95604 \
-	pr96203 \
 	aarch64-offload \
-	gdc-fix-966026 \
-
- ifneq ($(GFDL_INVARIANT_FREE),yes)
-   debian_patches += pr96203-doc
- endif
+	pr97250-0 \
+	pr97250-1 \
+	pr97250-2 \
+	pr97250-3 \
+	pr97250-follow-up \
+	pr98274 \
+	pr97714 \
+	pr98920 \
+	pr99264-revert \
+	pr99773 \
 
 ifneq (,$(filter $(distrelease),wheezy jessie stretch buster lucid precise trusty xenial bionic cosmic disco eoan))
   debian_patches += pr85678-revert
@@ -130,6 +133,7 @@ debian_patches += gm2 gm2-texinfo gm2-bootstrap-compare
 # This seems to work now ...
 #debian_patches += gm2-no-lto
 debian_patches += gm2-jit-def
+debian_patches += gm2-link
 
 # Most of the time, it would be safe to apply them whether the
 # language is selected or not. But when working on a new GCC version,
@@ -161,7 +165,7 @@ endif
 ifeq ($(GFDL_INVARIANT_FREE),yes)
   debian_patches += gdc-texinfo
 endif
-ifneq ($(with_libphobos),yes)
+ifneq ($(with_phobos),yes)
   debian_patches += gdc-driver-nophobos
 endif
 ifeq (,$(filter $(DEB_TARGET_ARCH),amd64 i386 armhf))
@@ -186,6 +190,7 @@ debian_patches += \
 	gdc-dynamic-link-phobos \
 	ia64-disable-selective-scheduling \
 	gcc-foffload-default \
+	libstdc++-pythondir \
 
 ifeq ($(with_ibm_branch),yes)
   debian_patches += ibm-branch

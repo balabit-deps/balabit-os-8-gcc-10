@@ -77,7 +77,7 @@
  
 --- a/src/libgm2/libm2min/Makefile.in
 +++ b/src/libgm2/libm2min/Makefile.in
-@@ -372,7 +372,7 @@ MAKEOVERRIDES =
+@@ -369,7 +369,7 @@ MAKEOVERRIDES =
  version := $(shell $(CC) -dumpversion)
  
  # Directory in which the compiler finds libraries etc.

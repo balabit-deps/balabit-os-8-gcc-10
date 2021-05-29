@@ -68,14 +68,14 @@
  
 --- a/src/lto-plugin/Makefile.in
 +++ b/src/lto-plugin/Makefile.in
-@@ -338,7 +338,7 @@ with_libiberty = @with_libiberty@
+@@ -341,7 +341,7 @@ with_libiberty = @with_libiberty@
  ACLOCAL_AMFLAGS = -I .. -I ../config
  AUTOMAKE_OPTIONS = no-dependencies
  gcc_version := $(shell @get_gcc_base_ver@ $(top_srcdir)/../gcc/BASE-VER)
 -libexecsubdir := $(libexecdir)/gcc/$(real_target_noncanonical)/$(gcc_version)$(accel_dir_suffix)
 +libexecsubdir := $(libexecdir)/gcc-cross/$(real_target_noncanonical)/$(gcc_version)$(accel_dir_suffix)
  AM_CPPFLAGS = -I$(top_srcdir)/../include $(DEFS)
- AM_CFLAGS = @ac_lto_plugin_warn_cflags@
+ AM_CFLAGS = @ac_lto_plugin_warn_cflags@ $(CET_HOST_FLAGS)
  AM_LDFLAGS = @ac_lto_plugin_ldflags@
 --- a/src/lto-plugin/Makefile.am
 +++ b/src/lto-plugin/Makefile.am
@@ -87,7 +87,7 @@
 +libexecsubdir := $(libexecdir)/gcc-cross/$(real_target_noncanonical)/$(gcc_version)$(accel_dir_suffix)
  
  AM_CPPFLAGS = -I$(top_srcdir)/../include $(DEFS)
- AM_CFLAGS = @ac_lto_plugin_warn_cflags@
+ AM_CFLAGS = @ac_lto_plugin_warn_cflags@ $(CET_HOST_FLAGS)
 --- a/src/libitm/Makefile.in
 +++ b/src/libitm/Makefile.in
 @@ -459,7 +459,7 @@ SUBDIRS = testsuite
@@ -112,7 +112,7 @@
  
 --- a/src/gcc/gcc.c
 +++ b/src/gcc/gcc.c
-@@ -4597,7 +4597,7 @@ process_command (unsigned int decoded_op
+@@ -4632,7 +4632,7 @@ process_command (unsigned int decoded_op
  	 GCC_EXEC_PREFIX is typically a directory name with a trailing
  	 / (which is ignored by make_relative_prefix), so append a
  	 program name.  */
@@ -121,7 +121,7 @@
        gcc_libexec_prefix = get_relative_prefix (tmp_prefix,
  						standard_exec_prefix,
  						standard_libexec_prefix);
-@@ -4623,15 +4623,15 @@ process_command (unsigned int decoded_op
+@@ -4658,15 +4658,15 @@ process_command (unsigned int decoded_op
      {
        int len = strlen (gcc_exec_prefix);
  
@@ -155,7 +155,7 @@
  # Directory in which all plugin resources are installed
  plugin_resourcesdir = $(libsubdir)/plugin
   # Directory in which plugin headers are installed
-@@ -2214,8 +2214,8 @@ default-d.o: config/default-d.c
+@@ -2223,8 +2223,8 @@ default-d.o: config/default-d.c
  
  DRIVER_DEFINES = \
    -DSTANDARD_STARTFILE_PREFIX=\"$(unlibsubdir)/\" \
@@ -166,7 +166,7 @@
    -DDEFAULT_TARGET_VERSION=\"$(version)\" \
    -DDEFAULT_REAL_TARGET_MACHINE=\"$(real_target_noncanonical)\" \
    -DDEFAULT_TARGET_MACHINE=\"$(target_noncanonical)\" \
-@@ -2935,7 +2935,7 @@ PREPROCESSOR_DEFINES = \
+@@ -2944,7 +2944,7 @@ PREPROCESSOR_DEFINES = \
    -DTOOL_INCLUDE_DIR=\"$(gcc_tooldir)/include\" \
    -DNATIVE_SYSTEM_HEADER_DIR=\"$(NATIVE_SYSTEM_HEADER_DIR)\" \
    -DPREFIX=\"$(prefix)/\" \
@@ -301,7 +301,7 @@
  
 --- a/src/libcc1/Makefile.am
 +++ b/src/libcc1/Makefile.am
-@@ -37,7 +37,7 @@ libiberty = $(if $(wildcard $(libiberty_
+@@ -40,7 +40,7 @@ libiberty = $(if $(wildcard $(libiberty_
  	    $(Wc)$(libiberty_normal)))
  libiberty_dep = $(patsubst $(Wc)%,%,$(libiberty))
  
@@ -312,7 +312,7 @@
  if ENABLE_PLUGIN
 --- a/src/libcc1/Makefile.in
 +++ b/src/libcc1/Makefile.in
-@@ -393,7 +393,7 @@ libiberty = $(if $(wildcard $(libiberty_
+@@ -394,7 +394,7 @@ libiberty = $(if $(wildcard $(libiberty_
  	    $(Wc)$(libiberty_normal)))
  
  libiberty_dep = $(patsubst $(Wc)%,%,$(libiberty))
@@ -344,7 +344,7 @@
  @SANITIZER_SUPPORTED_TRUE@	$(am__append_3) lsan asan ubsan \
 --- a/src/libphobos/configure.ac
 +++ b/src/libphobos/configure.ac
-@@ -228,6 +228,8 @@ AC_SUBST(SPEC_PHOBOS_DEPS)
+@@ -250,6 +250,8 @@ AC_SUBST(SPEC_PHOBOS_DEPS)
  libtool_VERSION=1:0:0
  AC_SUBST(libtool_VERSION)
  

@@ -1,8 +1,6 @@
 ifeq ($(with_offload_hsa),yes)
   #arch_binaries := $(arch_binaries) hsa
-  ifeq ($(with_common_libs),yes)
-    arch_binaries := $(arch_binaries) hsa-plugin
-  endif
+  arch_binaries := $(arch_binaries) hsa-plugin
 endif
 
 p_hsa	= gcc$(pkg_ver)-offload-hsa

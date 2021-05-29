@@ -330,14 +330,13 @@ ifneq ($(trunk_build),yes)
   ifeq ($(DEB_BUILD_ARCH_BITS)-$(DEB_HOST_ARCH_BITS),64-64)
     with_lto_build := yes
   endif
-  with_lto_build := yes
 
   # FIXME: hppa has issues with parsing the jobs output.
   # FIXME: m68k, riscv64 and sh4 running on simulators, don't care ...
   # FIXME: buildds not powerful ebough: mips*
   # FIXME: just let it build, takes too long: hurd-i386
   # FIXME: not yet tried to build: alpha
-  ifneq (,$(filter $(DEB_HOST_ARCH), alpha hppa m68k mips mipsel mips64el riscv64 sh4 sparc64 hurd-i386))
+  ifneq (,$(filter $(DEB_HOST_ARCH), alpha hppa m68k mips mipsel mips64el riscv64 sh4 hurd-i386))
     with_lto_build :=
   endif
 
@@ -348,8 +347,8 @@ ifneq ($(trunk_build),yes)
   endif
 endif
 
-with_lto_build := disabled for GCC 10
-with_bootstrap :=
+#with_lto_build := disabled for GCC 10
+#with_bootstrap :=
 
 ifneq ($(findstring nolto, $(DEB_BUILD_OPTIONS)),)
   with_lto_build :=
@@ -502,6 +501,9 @@ endif
 
 # allows to wrote backtraces for ICEs
 #unstripped_exe = yes
+#ifneq (,$(filter $(DEB_TARGET_ARCH), amd64 armel armhf arm64 ppc64el s390x))
+#  unstripped_exe = yes
+#endif
 
 # common things ---------------
 # build common packages, where package names don't differ in different
@@ -765,10 +767,13 @@ with_offload_nvptx := $(call envfilt, nvptx, , , $(with_offload_nvptx))
 gcn_archs := amd64
 gcn_target_name = amdgcn-amdhsa
 
-ifneq (,$(filter $(distrelease),buster xenial bionic eoan))
+ifneq (,$(filter $(distrelease),buster xenial bionic eoan focal groovy))
   gcn_tools_llvm_version = 9
+else ifneq (,$(filter $(distrelease),focal groovy))
+  gcn_tools_llvm_version = 11
+  pkg_llvm_ver = 1:11.0.1~
 else
-  gcn_tools_llvm_version = 10
+  gcn_tools_llvm_version = tools
 endif
 
 ifneq (,$(filter $(DEB_TARGET_ARCH),$(gcn_archs)))
@@ -840,11 +845,6 @@ endif
 ifeq (,$(filter $(DEB_STAGE),stage1 stage2))
 # Ada --------------------
 ada_no_cpus	:= m32r sh3 sh3eb sh4eb
-# no Debian builds ... some of these should exist
-# ... cross-build-native cross-builds a non-working compiler ...
-ifneq (,$(filter $(build_type), build-native))
-  ada_no_cpus += m68k # see https://bugs.debian.org/868365
-endif
 ada_no_systems	:= 
 ada_no_cross	:= no
 ada_no_snap	:= no
@@ -917,6 +917,11 @@ ifeq ($(with_ada),yes)
   with_libgnat := yes
   #with_gnatsjlj := yes
 endif
+
+# This should be checked after the gnat transition has been prepared
+# in experimental, and just before doing the gnat's defaults change
+# in unstable.
+#export DEB_CHECK_ALI_UPDATE=1
 
 # C++ -------------------------
 cxx_no_cpus := avr
@@ -996,6 +1001,8 @@ go_no_systems := kfreebsd
 ifneq (,$(filter $(distrelease),precise))
   go_no_archs = armhf
 endif
+# Debian #969221
+go_no_archs += sh4
 
 ifneq ($(with_base_only),yes)
   ifneq ($(separate_lang),yes)
@@ -1273,9 +1280,7 @@ ifeq ($(with_m2),yes)
   ifeq ($(with_dev),yes)
     with_m2dev := yes
   endif
-  ifeq ($(with_common_libs),yes)
-    with_libgm2 := yes
-  endif
+  with_libgm2 := yes
   enabled_languages += m2
 endif
 
@@ -1348,6 +1353,11 @@ with_backtrace := yes
 backtrace_no_archs = m68k
 ifneq (,$(filter $(DEB_TARGET_ARCH),$(backtrace_no_archs)))
   with_backtrace :=
+endif
+
+strip_sanitizer =
+ifneq (,$(filter $(distrelease),jessie stretch buster precise xenial bionic))
+  strip_sanitizer = yes
 endif
 
 # asan / sanitizer --------------------
@@ -1542,7 +1552,7 @@ else
     with_shared_libgcc := yes
     ifeq ($(with_common_libs),yes)
       with_libgcc := yes
-      ifneq (,$(filter $(distrelease),wheezy jessie stretch buster lucid precise trusty xenial bionic eoan focal))
+      ifneq (,$(filter $(distrelease),wheezy jessie stretch buster bullseye sid lucid precise trusty xenial bionic eoan focal))
         ifneq (,$(filter $(build_type), build-native cross-build-native))
           with_libcompatgcc := yes
         endif
@@ -1551,10 +1561,8 @@ else
   endif
 
   # libphobos -----------------
-  ifeq ($(with_phobos)-$(with_common_libs),yes-yes)
-    ifeq ($(with_common_libs),yes)
-      with_libphobos := yes
-    endif
+  ifeq ($(with_phobos),yes)
+    with_libphobos := yes
   endif
 
   # libgcc-math --------------------
@@ -1620,7 +1628,7 @@ endif
 ifneq (,$(with_rtlibs))
   with_check := disabled for rtlibs stage
 endif
-check_no_cpus := m68k
+#check_no_cpus := m68k
 check_no_systems := # gnu kfreebsd-gnu
 ifneq (,$(filter $(DEB_TARGET_ARCH_CPU),$(check_no_cpus)))
   with_check := disabled for cpu $(DEB_TARGET_ARCH_CPU)
@@ -1643,6 +1651,12 @@ endif
 #    with_check := disabled for $(DEB_HOST_ARCH), testsuite timeouts with expect
 #  endif
 #endif
+# override the Debian porters, we need to know about the test results
+ifeq ($(distribution),Debian)
+  ifneq (,$(filter $(DEB_HOST_ARCH), m68k sh4))
+    with_check := yes
+  endif
+endif
 ifeq ($(distribution)-$(DEB_HOST_ARCH),Ubuntu-riscv64)
   with_check := disabled for $(DEB_HOST_ARCH) on Ubuntu, qemu builders
 endif

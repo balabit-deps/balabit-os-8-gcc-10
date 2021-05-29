@@ -62,7 +62,7 @@ Uploaders: Iain Buclaw <ibuclaw@ubuntu.com>, Matthias Klose <doko@debian.org>
 ', `dnl
 Uploaders: Matthias Klose <doko@debian.org>
 ')dnl SRCNAME
-Standards-Version: 4.5.0
+Standards-Version: 4.5.1
 ifdef(`TARGET',`dnl cross
 Build-Depends: DEBHELPER_BUILD_DEP DPKG_BUILD_DEP
   LIBC_BUILD_DEP, LIBC_BIARCH_BUILD_DEP
@@ -73,7 +73,7 @@ Build-Depends: DEBHELPER_BUILD_DEP DPKG_BUILD_DEP
   libzstd-dev, zlib1g-dev, gawk, lzma, xz-utils, patchutils,
   pkg-config, libgc-dev,
   zlib1g-dev, SDT_BUILD_DEP
-  bison (>= 1:2.3), flex, coreutils (>= 2.26) | realpath (>= 1.9.12), lsb-release, quilt
+  bison (>= 1:2.3), flex, coreutils (>= 2.26) | realpath (>= 1.9.12), lsb-release, quilt, time
 ',`dnl native
 Build-Depends: DEBHELPER_BUILD_DEP DPKG_BUILD_DEP GCC_MULTILIB_BUILD_DEP
   LIBC_BUILD_DEP, LIBC_BIARCH_BUILD_DEP LIBC_DBG_DEP
@@ -88,7 +88,7 @@ Build-Depends: DEBHELPER_BUILD_DEP DPKG_BUILD_DEP GCC_MULTILIB_BUILD_DEP
   texinfo (>= 4.3), LOCALES, sharutils,
   procps, FORTRAN_BUILD_DEP GNAT_BUILD_DEP GO_BUILD_DEP GDC_BUILD_DEP GM2_BUILD_DEP
   ISL_BUILD_DEP MPC_BUILD_DEP MPFR_BUILD_DEP GMP_BUILD_DEP PHOBOS_BUILD_DEP
-  CHECK_BUILD_DEP coreutils (>= 2.26) | realpath (>= 1.9.12), chrpath, lsb-release, quilt,
+  CHECK_BUILD_DEP coreutils (>= 2.26) | realpath (>= 1.9.12), chrpath, lsb-release, quilt, time,
   pkg-config, libgc-dev,
   TARGET_TOOL_BUILD_DEP
 Build-Depends-Indep: LIBSTDCXX_BUILD_INDEP
@@ -100,8 +100,8 @@ Homepage: http://gdcproject.org/
 ', `dnl
 Homepage: http://gcc.gnu.org/
 ')dnl SRCNAME
-Vcs-Browser: https://salsa.debian.org/toolchain-team/gcc
-Vcs-Git: https://salsa.debian.org/toolchain-team/gcc.git
+Vcs-Browser: https://salsa.debian.org/toolchain-team/gcc/tree/gcc-10-debian
+Vcs-Git: https://salsa.debian.org/toolchain-team/gcc.git -b gcc-10-debian
 XS-Testsuite: autopkgtest
 
 ifelse(regexp(SRCNAME, `gcc-snapshot'),0,`dnl
@@ -209,6 +209,9 @@ Provides: libgcc1`'LS (= ${gcc:EpochVersion}), ifdef(`TARGET',`libgcc-s1-TARGET-
 ifdef(`MULTIARCH', `Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
 ')`'dnl
+ifdef(`LIBGCCPROTECTED', `XB-Important: yes
+Protected: yes
+')`'dnl
 ifdef(`TARGET',`dnl
 Breaks: libgcc1`'LS (<< 1:10)
 Replaces: libgcc1`'LS (<< 1:10)
@@ -290,12 +293,18 @@ Priority: optional
 ifdef(`MULTIARCH', `Multi-Arch: same
 Pre-Depends: ${misc:Pre-Depends}
 ')`'dnl
+ifdef(`LIBGCCPROTECTED', `XB-Important: yes
+Protected: yes
+')`'dnl
 Depends: BASELDEP, ${shlibs:Depends}, ${misc:Depends}
 Provides: libgcc2`'LS (= ${gcc:EpochVersion}), ifdef(`TARGET',`libgcc-s2-TARGET-dcv1')`'
 ifdef(`TARGET',`dnl
 Breaks: libgcc2`'LS (<< 1:10)
 Replaces: libgcc2`'LS (<< 1:10)
-')dnl
+',`dnl
+Breaks: ${libgcc:Breaks}
+Replaces: libgcc2`'LS (<< 1:10)
+')`'dnl
 BUILT_USING`'dnl
 Description: GCC support library`'ifdef(`TARGET',` (TARGET)', `')
  Shared version of the support library, a library of internal subroutines
@@ -363,13 +372,19 @@ Package: libgcc-s4`'LS
 TARGET_PACKAGE`'dnl
 Architecture: ifdef(`TARGET',`CROSS_ARCH',`hppa')
 ifdef(`MULTIARCH', `Multi-Arch: same
+ifdef(`LIBGCCPROTECTED', `XB-Important: yes
+Protected: yes
+')`'dnl
 Pre-Depends: ${misc:Pre-Depends}
 ')`'dnl
 Provides: libgcc4`'LS (= ${gcc:EpochVersion})
 ifdef(`TARGET',`dnl
 Breaks: libgcc4`'LS (<< 1:10)
 Replaces: libgcc4`'LS (<< 1:10)
-')dnl
+',`dnl
+Breaks: ${libgcc:Breaks}
+Replaces: libgcc4`'LS (<< 1:10)
+')`'dnl
 Section: ifdef(`TARGET',`devel',`libs')
 Priority: optional
 Depends: BASELDEP, ${shlibs:Depends}, ${misc:Depends}
@@ -6124,8 +6139,7 @@ ifdef(`TARGET',`Multi-Arch: foreign
 Priority: optional
 Depends: BASEDEP, gcc`'PV (= ${gcc:Version}), ${dep:libcdev},
   libgomp-plugin-amdgcn`'GOMP_SO (>= ${gcc:Version}),
-  llvm-LLVM_VER, lld-LLVM_VER,
-  ${shlibs:Depends}, ${misc:Depends}
+  LLVM_DEP ${shlibs:Depends}, ${misc:Depends}
 BUILT_USING`'dnl
 Description: GCC offloading compiler to GCN
  The package provides offloading support for AMD GCN.  OpenMP and OpenACC
@@ -6176,7 +6190,7 @@ Package: gcc`'PV-source
 Multi-Arch: foreign
 Architecture: all
 Priority: PRI(optional)
-Depends: make, quilt, patchutils, sharutils, gawk, lsb-release, AUTO_BUILD_DEP
+Depends: make, quilt, patchutils, sharutils, gawk, lsb-release, time, AUTO_BUILD_DEP
   ${misc:Depends}
 Description: Source of the GNU Compiler Collection
  This package contains the sources and patches which are needed to

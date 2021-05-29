@@ -41,6 +41,8 @@ else
   ULIMIT_M = true
 endif
 
+time_command = /usr/bin/time -v
+
 ifeq ($(locale_data),generate)
   SET_LOCPATH = LOCPATH=$(CURDIR)/locales
 endif
@@ -768,10 +770,14 @@ ifeq ($(trunk_build),yes)
   ifeq ($(findstring --disable-werror, $(CONFARGS)),)
     CONFARGS += --disable-werror
   endif
-  CONFARGS += --enable-checking=yes
+  enable_checking = yes
 else
-  CONFARGS += --enable-checking=release
+  ifneq (,$(filter $(DEB_TARGET_ARCH), amd64 armel armhf arm64 ppc64el s390x))
+    enable_checking = yes,extra,rtl
+  endif
+  enable_checking = release
 endif
+CONFARGS += --enable-checking=$(enable_checking)
 
 CONFARGS += \
 	--build=$(DEB_BUILD_GNU_TYPE) \
@@ -831,7 +837,7 @@ DEJAGNU_RUNS =
 ifneq ($(trunk_build),yes)
 ifeq ($(with_ssp),yes)
   # the buildds are just slow ... don't check the non-default
-  ifneq (,$(findstring $(DEB_TARGET_GNU_CPU),sh4 mips))
+  ifneq (,$(findstring $(DEB_TARGET_GNU_CPU),alpha hppa m68k mips sh4))
     DEJAGNU_RUNS =
   else ifneq (,$(filter $(DEB_TARGET_ARCH),armel))
     DEJAGNU_RUNS =
@@ -1237,7 +1243,7 @@ ifeq ($(build_type),build-native)
 	  $(SET_PATH) \
 	  $(SET_SHELL) \
 	  $(SET_LOCPATH) \
-	    $(MAKE) $(NJOBS) -C $(builddir) $(bootstrap_target) \
+	    $(time_command) $(MAKE) $(NJOBS) -C $(builddir) $(bootstrap_target) \
 		$(call pass_vars, CC $(flags_to_pass) \
 		  STAGE1_CFLAGS                         STAGE1_LDFLAGS \
 		  BOOT_CFLAGS                           BOOT_LDFLAGS \
@@ -1247,6 +1253,7 @@ ifeq ($(build_type),build-native)
 		; \
 	  status=$$?; \
 	  echo $$status > status; \
+	  echo === TIME $@ ===; \
 	  if [ $$status -eq 0 ] || [ $$try -eq $(MAX_BUILD_TRIES) ]; then \
 	    exit $$status; \
 	  fi; \
@@ -1257,11 +1264,12 @@ else ifneq (,$(filter $(build_type),build-cross cross-build-native cross-build-c
 	  set +e; \
 	  $(SET_PATH) \
 	  $(SET_LOCPATH) \
-	    $(MAKE) $(NJOBS) -C $(builddir) \
+	    $(time_command) $(MAKE) $(NJOBS) -C $(builddir) \
 		$(call pass_vars, BOOT_CFLAGS       BOOT_LDFLAGS \
 		                  CFLAGS_FOR_TARGET LDFLAGS_FOR_TARGET) \
 		; \
 	  echo $$? > status; \
+	  echo === TIME $@ ===; \
 	) 2>&1 | tee bootstrap-protocol
 endif
 	@echo TTTTT $$(date -R)
@@ -1287,11 +1295,13 @@ endif
 	    > bootstrap-summary; \
 	fi
 
-ifeq ($(DEB_CHECK_ALI_UPDATE)$(with_libgnat)$(build_type),1yesbuild-native)
+	-sh debian/ada/check_ali_update.sh /$(gcc_lib_dir)/adalib build/gcc/ada/rts
+ifeq ($(DEB_CHECK_ALI_UPDATE)-$(with_libgnat)-$(build_type),1-yes-build-native)
 	sh debian/ada/check_ali_update.sh /$(gcc_lib_dir)/adalib build/gcc/ada/rts
 endif
 
 	touch $(build_stamp)
+	@echo === END $@ ===
 
 ifneq ($(build_type),build-native)
   BUILT_CC = $(CC)
@@ -1344,11 +1354,12 @@ $(build_jit_stamp): $(configure_jit_stamp)
 	  $(SET_LOCPATH) \
 	  LD_LIBRARY_PATH=$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(builddir)/gcc \
 	  biarch_multidir_names=none \
-		$(MAKE) $(NJOBS) -C $(builddir_jit) \
+		$(time_command) $(MAKE) $(NJOBS) -C $(builddir_jit) \
 		$(call pass_vars, BOOT_CFLAGS       BOOT_LDFLAGS \
 		                  CFLAGS_FOR_TARGET LDFLAGS_FOR_TARGET) \
 		; \
 	  echo $$? > status; \
+	  echo === TIME $@ ===; \
 	) 2>&1 | tee jit-protocol
 
 	s=`cat status`; rm -f status; \
@@ -1374,6 +1385,7 @@ ifeq ($(with_check),yes)
 endif
 
 	touch $(build_jit_stamp)
+	@echo === END $@ ===
 
 CONFARGS_NVPTX := \
 	--prefix=/$(PF) \
@@ -1430,11 +1442,12 @@ $(build_nvptx_stamp): $(configure_nvptx_stamp) \
 	  $(SET_LOCPATH) \
 	  LD_LIBRARY_PATH=$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(builddir)/gcc \
 	  biarch_multidir_names=none \
-		$(MAKE) $(NJOBS) -C $(builddir_nvptx) \
+		$(time_command) $(MAKE) $(NJOBS) -C $(builddir_nvptx) \
 		$(call pass_vars, BOOT_CFLAGS BOOT_LDFLAGS \
 		                  CFLAGS_FOR_TARGET) \
 		; \
 	  echo $$? > status; \
+	  echo === TIME $@ ===; \
 	) 2>&1 | tee nvptx-protocol
 
 	s=`cat status`; rm -f status; \
@@ -1450,6 +1463,7 @@ $(build_nvptx_stamp): $(configure_nvptx_stamp) \
 
 	rm -f $(srcdir)/newlib
 	touch $(build_nvptx_stamp)
+	@echo === END $@ ===
 
 CONFARGS_GCN := \
 	--prefix=/$(PF) \
@@ -1486,13 +1500,16 @@ $(configure_gcn_stamp): $(build_stamp) \
 	dh_testdir
 
 	rm -rf bin-gcn
+ifeq ($(gcn_tools_llvm_version),tools)
+	ln -s /usr/$(gcn_target_name)/bin bin-gcn
+else
 	mkdir bin-gcn
 	ln -sf /usr/lib/llvm-$(gcn_tools_llvm_version)/bin/llvm-ar bin-gcn/ar
 	ln -sf /usr/lib/llvm-$(gcn_tools_llvm_version)/bin/llvm-mc bin-gcn/as
 	ln -sf /usr/lib/llvm-$(gcn_tools_llvm_version)/bin/lld bin-gcn/ld
 	ln -sf /usr/lib/llvm-$(gcn_tools_llvm_version)/bin/llvm-nm bin-gcn/nm
 	ln -sf /usr/lib/llvm-$(gcn_tools_llvm_version)/bin/llvm-ranlib bin-gcn/ranlib
-
+endif
 	rm -f $(configure_gcn_stamp) $(build_gcn_stamp)
 	rm -rf src-gcn $(builddir_gcn)
 	cp -al src src-gcn
@@ -1522,11 +1539,12 @@ $(build_gcn_stamp): $(configure_gcn_stamp) \
 	  $(SET_LOCPATH) \
 	  LD_LIBRARY_PATH=$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(builddir)/gcc \
 	  biarch_multidir_names=none \
-		$(MAKE) $(NJOBS) -C $(builddir_gcn) \
+		$(time_command) $(MAKE) $(NJOBS) -C $(builddir_gcn) \
 		$(call pass_vars, BOOT_CFLAGS BOOT_LDFLAGS \
 		                  CFLAGS_FOR_TARGET) \
 		; \
 	  echo $$? > status; \
+	  echo === TIME $@ ===; \
 	) 2>&1 | tee amdgcn-protocol
 
 	s=`cat status`; rm -f status; \
@@ -1542,6 +1560,7 @@ $(build_gcn_stamp): $(configure_gcn_stamp) \
 
 	rm -f $(srcdir)/newlib
 	touch $(build_gcn_stamp)
+	@echo === END $@ ===
 
 ifeq ($(versioned_packages),yes)
   hppa64_configure_flags += --program-suffix=-$(BASE_VERSION)
@@ -1598,13 +1617,14 @@ $(build_hppa64_stamp): $(configure_hppa64_stamp) \
 	  $(SET_SHELL) \
 	  $(SET_LOCPATH) \
 	  LD_LIBRARY_PATH=$${LD_LIBRARY_PATH:+$$LD_LIBRARY_PATH:}$(builddir)/gcc \
-	    $(MAKE) $(NJOBS) -C $(builddir_hppa64) \
+	    $(time_command) $(MAKE) $(NJOBS) -C $(builddir_hppa64) \
 		$(call pass_vars, \
 		  CFLAGS_FOR_TARGET CXXFLAGS_FOR_TARGET LDFLAGS_FOR_TARGET)
 	if [ -f $(srcdir)/gcc/distro-defaults.h.saved ]; then \
 	  mv -f $(srcdir)/gcc/distro-defaults.h.saved $(srcdir)/gcc/distro-defaults.h; \
 	fi
 	touch $(build_hppa64_stamp)
+	@echo === END $@ ===
 
 ifeq ($(with_ada),yes)
   MANUALS = \
@@ -2208,16 +2228,16 @@ ifeq ($(with_hppa64),yes)
 	rm -rf $(d)/$(PF)/share/info
 	rm -rf $(d)/$(PF)/share/man
 	rm -f $(d)/$(PF)/$(libdir)/libiberty.a
-	rm -f $(d)/$(PF)/bin/*{gcov,gcov-dump,gcov-tool,gccbug,gcc}
+	rm -f $(d)/$(PF)/bin/*{gcov,gcov-dump,gcov-tool,gccbug,lto-dump}
 
 	rm -rf $(d)/$(PF)/hppa64-linux-gnu/include
 	rm -rf $(d)/$(PF)/hppa64-linux-gnu/lib
 
 	-find $(d)/$(PF)
-	mkdir -p $(d)/$(PF)/hppa64-linux-gnu/$(versiondir)/include
-	mv $(d)/$(PF)/hppa64-linux-gnu/$(versiondir)/include-fixed/{limits,syslimits}.h \
-	  $(d)/$(PF)/hppa64-linux-gnu/$(versiondir)/include/.
-	rm -rf $(d)/$(PF)/$(libdir)/gcc/hppa64-linux-gnu/$(versiondir)/include-fixed
+	mkdir -p $(d)/$(PF)/lib/gcc/hppa64-linux-gnu/$(versiondir)/include
+	mv $(d)/$(PF)/lib/gcc/hppa64-linux-gnu/$(versiondir)/include-fixed/{limits,syslimits}.h \
+	  $(d)/$(PF)/lib/gcc/hppa64-linux-gnu/$(versiondir)/include/.
+	rm -rf $(d)/$(PF)/lib/gcc/hppa64-linux-gnu/$(versiondir)/include-fixed
 endif
 
 	: # Work around PR lto/41569
@@ -2627,7 +2647,7 @@ $(install_hppa64_stamp): $(build_hppa64_stamp)
 	rm -rf $(d_hppa64)/$(PF)/lib/gcc/hppa64-linux-gnu/$(BASE_VERSION)/plugin
 	rm -f $(d_hppa64)/$(PF)/lib/libiberty.a
 	rm -f $(d_hppa64)/$(PF)/lib/libcc1.*
-	rm -f $(d_hppa64)/$(PF)/bin/*{gcov,gcov-dump,gcov-tool,gccbug,gcc}
+	rm -f $(d_hppa64)/$(PF)/bin/*{gcov,gcov-dump,gcov-tool,gccbug,gcc,lto-dump}
 
 	rm -rf $(d_hppa64)/$(PF)/hppa64-linux-gnu
 	rm -rf $(d_hppa64)/$(PF)/lib/gcc/hppa64-linux-gnu/$(BASE_VERSION)/install-tools
