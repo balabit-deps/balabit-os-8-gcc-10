@@ -8,14 +8,6 @@ endif
 # ---------------------------------------------------------------------------
 # gcc-base
 
-ifneq (,$(filter $(distrelease),oneiric precise wheezy sid))
-  additional_links =
-else ifneq (,$(filter $(distrelease),))
-  additional_links =
-else
-  additional_links =
-endif
-
 $(binary_stamp)-base: $(install_dependencies)
 	dh_testdir
 	dh_testroot

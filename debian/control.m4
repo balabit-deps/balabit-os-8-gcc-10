@@ -62,7 +62,7 @@ Uploaders: Iain Buclaw <ibuclaw@ubuntu.com>, Matthias Klose <doko@debian.org>
 ', `dnl
 Uploaders: Matthias Klose <doko@debian.org>
 ')dnl SRCNAME
-Standards-Version: 4.5.1
+Standards-Version: 4.6.2
 ifdef(`TARGET',`dnl cross
 Build-Depends: DEBHELPER_BUILD_DEP DPKG_BUILD_DEP
   LIBC_BUILD_DEP, LIBC_BIARCH_BUILD_DEP
@@ -72,7 +72,7 @@ Build-Depends: DEBHELPER_BUILD_DEP DPKG_BUILD_DEP
   ISL_BUILD_DEP MPC_BUILD_DEP MPFR_BUILD_DEP GMP_BUILD_DEP,
   libzstd-dev, zlib1g-dev, gawk, lzma, xz-utils, patchutils,
   pkg-config, libgc-dev,
-  zlib1g-dev, SDT_BUILD_DEP
+  zlib1g-dev, SDT_BUILD_DEP USAGE_BUILD_DEP
   bison (>= 1:2.3), flex, coreutils (>= 2.26) | realpath (>= 1.9.12), lsb-release, quilt, time
 ',`dnl native
 Build-Depends: DEBHELPER_BUILD_DEP DPKG_BUILD_DEP GCC_MULTILIB_BUILD_DEP
@@ -81,7 +81,7 @@ Build-Depends: DEBHELPER_BUILD_DEP DPKG_BUILD_DEP GCC_MULTILIB_BUILD_DEP
   AUTO_BUILD_DEP BASE_BUILD_DEP
   dwz, libunwind8-dev [ia64], libatomic-ops-dev [ia64],
   gawk, lzma, xz-utils, patchutils,
-  libzstd-dev, zlib1g-dev, SDT_BUILD_DEP
+  libzstd-dev, zlib1g-dev, SDT_BUILD_DEP USAGE_BUILD_DEP
   BINUTILS_BUILD_DEP,
   gperf (>= 3.0.1), bison (>= 1:2.3), flex, gettext,
   gdb`'NT [!riscv64], OFFLOAD_BUILD_DEP
@@ -463,8 +463,12 @@ Depends: BASELDEP, ${dep:libgcc}, ${dep:libssp}, ${dep:libgomp}, ${dep:libitm},
  ${dep:libqmath}, ${dep:libunwinddev}, ${shlibs:Depends}, ${misc:Depends}
 ifdef(`MULTIARCH', `Multi-Arch: same
 ')`'dnl
-ifdef(`TARGET',`',`Breaks: libgccjit`'PV-dev (<< 10-20200321-1)
-Replaces: libgccjit`'PV-dev (<< 10-20200321-1)
+ifdef(`TARGET',`dnl
+Breaks: libtsan`'TSAN_SO`'LS (<< 10.3.0-13)
+Replaces: libtsan`'TSAN_SO`'LS (<< 10.3.0-13)
+',`dnl
+Breaks: libgccjit`'PV-dev (<< 10-20200321-1), libtsan`'TSAN_SO`'LS (<< 10.3.0-13)
+Replaces: libgccjit`'PV-dev (<< 10-20200321-1), libtsan`'TSAN_SO`'LS (<< 10.3.0-13)
 ')`'dnl
 BUILT_USING`'dnl
 Description: GCC support library (development files)

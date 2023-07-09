@@ -42,6 +42,9 @@ else
 endif
 
 time_command = /usr/bin/time -v
+ifeq ($(usage_stats),yes)
+  time_command += $(CURDIR)/debian/usage-wrapper.py $(NJOBS) --base-memory -m 2.0 -o usage-$(shell echo $@ | sed 's/.*0[1-9]-//;s/-stamp//').svg
+endif
 
 ifeq ($(locale_data),generate)
   SET_LOCPATH = LOCPATH=$(CURDIR)/locales
@@ -352,7 +355,9 @@ ifeq ($(with_phobos),yes)
 endif
 
 ifeq ($(with_d),yes)
-  ifneq ($(with_phobos),yes)
+  ifneq (,$(filter $(DEB_TARGET_ARCH), $(druntime_only_archs)))
+    CONFARGS += --with-libphobos-druntime-only=yes
+  else ifneq ($(with_phobos),yes)
     CONFARGS += --disable-libphobos
   endif
 endif
@@ -390,7 +395,7 @@ endif
 
 ifneq (,$(findstring powerpc64le-linux,$(DEB_TARGET_GNU_TYPE)))
     CONFARGS += --enable-secureplt
-    ifneq (,$(filter $(distrelease),jessie trusty utopic vivid wily))
+    ifneq (,$(filter $(distrelease), jessie trusty))
       CONFARGS += --with-cpu=power7 --with-tune=power8
     else
       CONFARGS += --with-cpu=power8
@@ -429,7 +434,7 @@ endif
 
 ifneq (,$(findstring aarch64,$(DEB_TARGET_GNU_CPU)))
   # requires binutils 2.25.90 or newer
-  ifeq (,$(filter $(distrelease),squeeze precise trusty utopic vivid wily))
+  ifeq (,$(filter $(distrelease), precise trusty))
     CONFARGS += --enable-fix-cortex-a53-843419
   endif
 endif
@@ -449,24 +454,25 @@ ifneq (,$(findstring arm, $(DEB_TARGET_GNU_CPU)))
   CONFARGS += --disable-sjlj-exceptions
   ifneq (,$(filter %armhf,$(DEB_TARGET_ARCH)))
     ifeq ($(distribution),Raspbian)
-      with_arm_arch = armv6
-      with_arm_fpu = vfp
+      with_arm_arch = armv6+fp
     else
-      with_arm_arch = armv7-a
-      with_arm_fpu = vfpv3-d16
+      ifneq (,$(filter $(distrelease), jessie stretch buster bullseye bookworm sid xenial bionic focal hirsute impish))
+        with_arm_fpu = vfpv3-d16
+        with_arm_arch = armv7-a
+      else
+        with_arm_fpu =
+        with_arm_arch = armv7-a+fp
+      endif
     endif
   else
     # armel
     ifeq ($(derivative),Debian)
-      ifneq (,$(filter $(distrelease),etch lenny squeeze wheezy jessie stretch))
+      ifneq (,$(filter $(distrelease), jessie stretch))
         with_arm_arch = armv4t
       else
         with_arm_arch = armv5te
       endif
-    else ifneq (,$(filter $(distrelease),karmic))
-      with_arm_arch = armv6
-      with_arm_fpu = vfpv3-d16
-    else ifneq (,$(filter $(distrelease),lucid maverick natty oneiric precise))
+    else ifneq (,$(filter $(distrelease), precise))
       with_arm_arch = armv7-a
       with_arm_fpu = vfpv3-d16
     else
@@ -535,7 +541,7 @@ endif
 
 ifneq (,$(findstring s390x-linux,$(DEB_TARGET_GNU_TYPE)))
   ifeq ($(derivative),Ubuntu)
-    ifneq (,$(filter $(distrelease),xenial bionic disco eoan focal))
+    ifneq (,$(filter $(distrelease),xenial bionic focal))
       CONFARGS += --with-arch=zEC12
     else
       CONFARGS += --with-arch=z13 --with-tune=z15
@@ -553,17 +559,9 @@ endif
 
 ifneq (,$(filter $(DEB_TARGET_ARCH), amd64 i386 kfreebsd-i386 kfreebsd-amd64))
   ifneq (,$(filter $(derivative),Ubuntu))
-    ifneq (,$(filter $(distrelease),dapper hardy))
-      CONFARGS += --with-arch-32=i486
-    else ifneq (,$(filter $(distrelease),jaunty karmic lucid))
-      CONFARGS += --with-arch-32=i586
-    else
-      CONFARGS += --with-arch-32=i686
-    endif
+    CONFARGS += --with-arch-32=i686
   else # Debian
-    ifneq (,$(filter $(distrelease),etch lenny))
-      CONFARGS += --with-arch-32=i486
-    else ifneq (,$(filter $(distrelease),squeeze wheezy jessie))
+    ifneq (,$(filter $(distrelease), jessie))
       CONFARGS += --with-arch-32=i586
     else
       CONFARGS += --with-arch-32=i686
@@ -810,12 +808,14 @@ ifeq ($(with_lto_build),yes)
 	--enable-link-mutex
 endif
 
+# this is the default, set in /usr/share/dejagnu/remote.exp
+# by a local dejagnu patch.
 DEJAGNU_TIMEOUT=300
 # Increase the timeout for one testrun on slow architectures
 ifeq ($(derivative),Debian)
-  ifneq (,$(findstring $(DEB_TARGET_ARCH),arm64))
+  ifneq (,$(findstring $(DEB_TARGET_ARCH),armel armhf arm64))
     DEJAGNU_TIMEOUT=300
-  else ifneq (,$(findstring $(DEB_TARGET_ARCH),arm armel armhf hppa m68k riscv64 sparc))
+  else ifneq (,$(findstring $(DEB_TARGET_ARCH),hppa m68k riscv64 sparc))
     DEJAGNU_TIMEOUT=600
   else ifneq (,$(findstring $(DEB_TARGET_GNU_CPU),x86_64 i386 i486 i586 i686))
     DEJAGNU_TIMEOUT=180
@@ -824,11 +824,11 @@ ifeq ($(derivative),Debian)
     DEJAGNU_TIMEOUT=900
   endif
 else ifeq ($(derivative),Ubuntu)
-  ifneq (,$(findstring $(DEB_TARGET_ARCH),arm64))
+  ifneq (,$(findstring $(DEB_TARGET_ARCH), armel armhf arm64))
     DEJAGNU_TIMEOUT=300
-  else ifneq (,$(findstring $(DEB_TARGET_ARCH),armel armhf riscv64))
+  else ifneq (,$(findstring $(DEB_TARGET_ARCH), riscv64))
     DEJAGNU_TIMEOUT=600
-  else ifneq (,$(findstring $(DEB_TARGET_GNU_CPU),x86_64 i386 i486 i586 i686))
+  else ifneq (,$(findstring $(DEB_TARGET_GNU_CPU),x86_64 i386 i486 i586 i686 power))
     DEJAGNU_TIMEOUT=180
   endif
 endif
@@ -1183,6 +1183,14 @@ endif
 	rm -rf $(builddir)
 	mkdir $(builddir)
 
+ifneq (,$(filter musl-%,$(DEB_TARGET_ARCH)))
+	# We have to unconditionally link -lssp_nonshared on musl (see
+	# musl-ssp.diff). While gcc provides it, it comes a little late in the
+	# build for bootstrapping so we provide an empty one.
+	mkdir $(builddir)/gcc
+	ar rcs $(builddir)/gcc/libssp_nonshared.a
+endif
+
 	: # some tools like gettext are built with a newer libstdc++
 	mkdir -p bin
 	for i in msgfmt; do \
@@ -1418,7 +1426,7 @@ $(configure_nvptx_stamp): $(build_stamp) \
 	rm -rf src-nvptx $(builddir_nvptx)
 	cp -al src src-nvptx
 	rm -rf src-nvptx/newlib
-	cp -a $(nl_nvptx_srcdir)/newlib src-nvptx/newlib
+	cp -a $(newlib_srcdir)/newlib src-nvptx/newlib
 	mkdir $(builddir_nvptx)
 
 	: # configure nvptx offload
@@ -1434,7 +1442,7 @@ $(build_nvptx_stamp): $(configure_nvptx_stamp) \
     $(if $(filter yes, $(with_jit)), $(build_jit_stamp)) \
     $(if $(filter yes, $(with_hppa64)), $(build_hppa64_stamp))
 	@echo === START $@ ===
-	ln -sf ../$(nl_nvptx_srcdir)/newlib $(srcdir)/newlib
+	ln -sf ../$(newlib_srcdir)/newlib $(srcdir)/newlib
 	( \
 	  set +e; \
 	  $(SET_PATH) \
@@ -1514,7 +1522,13 @@ endif
 	rm -rf src-gcn $(builddir_gcn)
 	cp -al src src-gcn
 	rm -rf src-gcn/newlib
-	cp -a $(nl_gcn_srcdir)/newlib src-gcn/newlib
+ifneq (,$(filter $(distrelease),focal))
+	: # FIXME, keep the old newlib for focal for now
+	tar xf debian/newlib-4.1.0.tar.xz
+	cp -a newlib-4.1.0/newlib src-gcn/newlib
+else
+	cp -a $(newlib_srcdir)/newlib src-gcn/newlib
+endif
 	mkdir $(builddir_gcn)
 
 	: # configure gcn offload
@@ -1531,7 +1545,7 @@ $(build_gcn_stamp): $(configure_gcn_stamp) \
     $(if $(filter yes, $(with_hppa64)), $(build_hppa64_stamp)) \
     $(if $(filter yes, $(with_offload_nvptx)), $(build_nvptx_stamp))
 	@echo === START $@ ===
-	ln -sf ../$(nl_gcn_srcdir)/newlib $(srcdir)/newlib
+	ln -sf ../$(newlib_srcdir)/newlib $(srcdir)/newlib
 	( \
 	  set +e; \
 	  $(SET_PATH) \
@@ -1719,12 +1733,26 @@ $(check_stamp): $(filter $(build_stamp) $(build_jit_stamp) $(build_hppa64_stamp)
 	ln -sf gcc $(builddir)/prev-gcc
 	ln -sf $(DEB_TARGET_GNU_TYPE) $(builddir)/prev-$(DEB_TARGET_GNU_TYPE)
 
+# FIXME: testing against a system libstdc++ built by a newer compiler version
+# libstdc++-prettyprinters/* tests fail, installation of libstdc++6-dbgsym
+# doesn't help.
+# Don't run these tests on slow buildds
+
 ifneq ($(with_common_libs),yes)
   ifeq ($(with_cxx),yes)
-	: # libstdc++6 built from newer gcc-X source, run testsuite against the installed lib
+    ifeq (,$(filter $(DEB_TARGET_ARCH), armel armhf mipsel mips64el))
+	: # check-jit is already run at this point. jit test results should
+	: # not end up in the libstdc++-test-summary report
+	if [ -f $(builddir)/gcc/testsuite/jit/jit.sum ]; then \
+	  mv $(builddir)/gcc/testsuite/jit/jit.log $(builddir)/gcc/testsuite/jit/jit.LOG; \
+	  mv $(builddir)/gcc/testsuite/jit/jit.sum $(builddir)/gcc/testsuite/jit/jit.SUM; \
+	fi
 
-	sed 's/-L[^ ]*//g' $(buildlibdir)/libstdc++-v3/scripts/testsuite_flags \
-	  > $(buildlibdir)/libstdc++-v3/scripts/testsuite_flags.installed
+	: # remove -L options for libstdc++-v3/src and libstdc++-v3/src/.libs
+	sed -e '/CXX_build=/s,-L[^ "]*v3/src/[^ "]*,,g' \
+	  $(buildlibdir)/libstdc++-v3/scripts/testsuite_flags \
+	    > $(buildlibdir)/libstdc++-v3/scripts/testsuite_flags.installed
+
 	-$(ULIMIT_M); \
 	    set +e; \
 	    for d in $(buildlibdir)/libstdc++-v3/testsuite; do \
@@ -1738,8 +1766,10 @@ ifneq ($(with_common_libs),yes)
 		$(MAKE) -k -C $$d $(NJOBS_TESTS) check $(RUNTESTFLAGS); \
 	    done 2>&1 | tee test-protocol2
 
+	cd $(builddir); \
 	BOOT_CFLAGS="$(BOOT_CFLAGS)" \
-	  $(srcdir)/contrib/test_summary -m "$(S_EMAIL)" > raw-test-summary
+	  $(srcdir)/contrib/test_summary -m "$(S_EMAIL)" > ../raw-test-summary
+
 	-( \
 	  sed -n '/^Mail/s/.*"\([^"][^"]*\)".*/\1/p' raw-test-summary; \
 	  awk '/^cat/, /^EOF/' raw-test-summary | grep -v EOF; \
@@ -1747,8 +1777,18 @@ ifneq ($(with_common_libs),yes)
 	echo 'BEGIN installed libstdc++-v3 test-summary'
 	cat libstdc++-test-summary
 	echo 'END installed libstdc++-v3 test-summary'
-	find $(buildlibdir)/libstdc++-v3/testsuite -name '*.log' -o -name '*.sum' \
-	  | xargs -r rm -f
+
+	: # keep the test results, but don't include them in the summary
+	mv $(buildlibdir)/libstdc++-v3/testsuite/libstdc++.log \
+	   $(buildlibdir)/libstdc++-v3/testsuite/libstdc++-installed.LOG
+	mv $(buildlibdir)/libstdc++-v3/testsuite/libstdc++.sum \
+	   $(buildlibdir)/libstdc++-v3/testsuite/libstdc++-installed.SUM
+
+	if [ -f $(builddir)/gcc/testsuite/jit/jit.SUM ]; then \
+	  mv $(builddir)/gcc/testsuite/jit/jit.LOG $(builddir)/gcc/testsuite/jit/jit.log; \
+	  mv $(builddir)/gcc/testsuite/jit/jit.SUM $(builddir)/gcc/testsuite/jit/jit.sum; \
+	fi
+    endif
   endif
 endif
 
@@ -1766,7 +1806,9 @@ ifeq ($(start_logwatch),yes)
 		$(builddir)/gcc/testsuite/gnat/gnat.log \
 		$(builddir)/gcc/testsuite/ada/acats/acats.log \
 		$(builddir)/gcc/testsuite/gfortran/gfortran.log \
-		$(builddir)/gcc/p/test/test_log \
+		$(builddir)/gcc/testsuite/go/go.log \
+		$(builddir)/gcc/testsuite/gdc/gdc.log \
+		$(builddir)/gcc/testsuite/gm2/gm2.log \
 		$(buildlibdir)/libstdc++-v3/testsuite/libstdc++.log \
 		$(buildlibdir)/libgomp/testsuite/libgomp.log \
 		$(buildlibdir)/libffi/testsuite/libffi.log \
@@ -1791,7 +1833,7 @@ endif
 	      EXTRA_TEST_PFLAGS=-g0 \
 	      DEJAGNU_TIMEOUT=$(DEJAGNU_TIMEOUT) \
 	      DEB_GCC_NO_O3=1 \
-		$(MAKE) -k -C $$d $(NJOBS_TESTS) check $(RUNTESTFLAGS); \
+		$(time_command) $(MAKE) -k -C $$d $(NJOBS_TESTS) check $(RUNTESTFLAGS); \
 	    done 2>&1 | tee test-protocol
 
 	-ps aux | fgrep logwatch | fgrep -v fgrep
@@ -1959,6 +2001,7 @@ clean: debian/control
 	rm -f debian/arch_binaries* debian/indep_binaries*
 	rm -rf bin bin-gcn locales share
 	rm -rf check-inst
+	rm -rf newlib-4.1.0
 	dh_clean
 ifneq (,$(filter $(build_type), build-cross cross-build-cross))
 	$(cross_clean) dh_clean
@@ -2508,7 +2551,7 @@ $(install_jit_stamp): $(build_jit_stamp) $(install_stamp)
 $(install_nvptx_stamp): $(build_nvptx_stamp)
 	@echo === START $@ ===
 	dh_testdir
-	ln -sf ../$(nl_nvptx_srcdir)/newlib $(srcdir)/newlib
+	ln -sf ../$(newlib_srcdir)/newlib $(srcdir)/newlib
 	rm -rf $(d)-nvptx
 	mkdir -p $(d)-nvptx/$(PF)
 
@@ -2563,7 +2606,7 @@ endif
 $(install_gcn_stamp): $(build_gcn_stamp)
 	@echo === START $@ ===
 	dh_testdir
-	ln -sf ../$(nl_gcn_srcdir)/newlib $(srcdir)/newlib
+	ln -sf ../$(newlib_srcdir)/newlib $(srcdir)/newlib
 	rm -rf $(d)-gcn
 	mkdir -p $(d)-gcn/$(PF)
 

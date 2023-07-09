@@ -28,13 +28,14 @@ configure: control $(unpack_stamp) $(patch_stamp)
 	$(MAKE) -f debian/rules2 $@
 
 pre-build:
-#ifneq (,$(filter $(distrelease),squeeze sid))
-#ifeq (,$(filter $(DEB_TARGET_ARCH),amd64 i386))
-#	@echo explicitely fail the build for $(DEB_TARGET_ARCH)
-#	@echo no bug report required. please ask the port maintainers if they support gcc-4.5.
-#	false
-#endif
-#endif
+# no backport support for these releases ..., keep conditionals for
+# Debian: jessie stretch buster bullseye ...
+# UBuntu: precise trusty xenial bionic focal groovy hirsute ...
+ifneq (,$(filter $(distrelease),lenny squeeze wheezy hardy lucid))
+	@echo explicitely fail the build for $(distribution)/$(distrelease) on $(DEB_TARGET_ARCH).
+	@echo no bug report required. please figure out the back port yourself.
+	false
+endif
 
 build: pre-build control
 	$(MAKE) $(NJOBS) -f debian/rules2 $@
@@ -51,7 +52,7 @@ $(check_stamp): $(build_stamp)
 clean:
 	rm -rf $(stampdir)
 # remove temporary dirs used for unpacking
-	rm -rf $(gcc_srcdir) $(gdc_srcdir) $(nl_nvptx_srcdir)
+	rm -rf $(gcc_srcdir) $(gdc_srcdir) $(newlib_srcdir)
 	-$(MAKE) -f debian/rules2 $@
 	rm -rf $(srcdir)* $(builddir)* debian/tmp* html
 	rm -f bootstrap-* first-move-stamp

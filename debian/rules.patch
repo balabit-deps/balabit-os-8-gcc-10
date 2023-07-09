@@ -24,6 +24,8 @@ ifneq ($(GFDL_INVARIANT_FREE),yes)
 	rename-info-files \
 	pr97250-doc \
 	pr97250-follow-up-doc \
+	gcc-mold-doc \
+	pr102952-doc \
 
 #	git-doc-updates \
 #	$(if $(with_linaro_branch),,svn-doc-updates) \
@@ -36,15 +38,8 @@ debian_patches += \
 debian_patches += \
 	gcc-textdomain \
 	gcc-distro-specs \
-	gcc-driver-extra-langs
-
-ifneq (,$(filter $(distrelease),etch lenny squeeze wheezy dapper hardy intrepid jaunty karmic lucid))
-  debian_patches += gcc-hash-style-both
-else
-  debian_patches += gcc-hash-style-gnu
-endif
-
-debian_patches += \
+	gcc-driver-extra-langs \
+	gcc-hash-style-gnu \
 	libstdc++-pic \
 	libstdc++-doclink \
 	libstdc++-man-3cxx \
@@ -84,10 +79,17 @@ debian_patches += \
 	pr98274 \
 	pr97714 \
 	pr98920 \
-	pr99264-revert \
 	pr99773 \
+	musl-ssp \
+	pr99264-follow-up \
+	arm-arch-extensions \
+	gcc-mold \
+	pr102952 \
+	pr91085 \
+	pr107475 \
+	libstdc++-hurd \
 
-ifneq (,$(filter $(distrelease),wheezy jessie stretch buster lucid precise trusty xenial bionic cosmic disco eoan))
+ifneq (,$(filter $(distrelease), jessie stretch buster precise trusty xenial bionic))
   debian_patches += pr85678-revert
   ifneq ($(GFDL_INVARIANT_FREE),yes)
     debian_patches += pr85678-doc-revert
@@ -165,9 +167,6 @@ endif
 ifeq ($(GFDL_INVARIANT_FREE),yes)
   debian_patches += gdc-texinfo
 endif
-ifneq ($(with_phobos),yes)
-  debian_patches += gdc-driver-nophobos
-endif
 ifeq (,$(filter $(DEB_TARGET_ARCH),amd64 i386 armhf))
   debian_patches += disable-gdc-tests
 endif
@@ -199,13 +198,17 @@ endif
 ifeq ($(with_softfloat),yes)
   debian_patches += arm-multilib-soft-float
 else ifeq ($(multilib),yes)
-  ifneq (,$(filter $(distrelease),lucid maverick natty oneiric precise))
-    debian_patches += arm-multilib-softfp$(if $(filter yes,$(DEB_CROSS)),-cross)
-  else
-    debian_patches += arm-multilib-soft$(if $(filter yes,$(DEB_CROSS)),-cross)
+  ifneq (,$(biarchhfarchs)$(biarchsfarchs))
+    ifneq (,$(filter $(distrelease), precise))
+      debian_patches += arm-multilib-softfp$(if $(filter yes,$(DEB_CROSS)),-cross)
+    else
+      debian_patches += arm-multilib-soft$(if $(filter yes,$(DEB_CROSS)),-cross)
+    endif
   endif
 endif
-debian_patches += arm-multilib-defaults
+ifneq (,$(filter $(distrelease), precise trusty xenial bionic focal groovy hirsute))
+  debian_patches += arm-multilib-defaults
+endif
 
 ifeq ($(DEB_CROSS),yes)
   debian_patches += cross-fixes
@@ -247,14 +250,12 @@ debian_patches += gcc-multilib-multiarch
 
 ifneq ($(trunk_build),yes)
 ifneq (,$(filter $(derivative),Ubuntu))
-  ifeq (,$(filter $(distrelease),dapper hardy intrepid jaunty karmic lucid maverick))
-    debian_patches += gcc-as-needed
-    ifeq (,$(filter $(distrelease),dapper hardy intrepid jaunty karmic lucid maverick precise trusty utopic vivid wily xenial yakkety))
-      debian_patches += gcc-as-needed-gold
-    endif
+  debian_patches += gcc-as-needed
+  ifeq (,$(filter $(distrelease), precise trusty xenial))
+    debian_patches += gcc-as-needed-gold
   endif
 else # Debian
-  ifeq (,$(filter $(distrelease),squeeze wheezy jessie stretch))
+  ifeq (,$(filter $(distrelease), jessie stretch))
     debian_patches += gcc-as-needed gcc-as-needed-gold
   endif
 endif
@@ -293,8 +294,7 @@ automake_files = $(addprefix ./, $(filter-out none, \
 	    | sed -rn '/Makefile\.(am|in)$$/s:[^/]+/src/:src/:p' | sort -u)))
 
 autoconf_version = 2.69
-# FIXME should have a separate 2.69 package
-ifeq (,$(filter $(distrelease),lucid precise))
+ifneq (,$(filter $(distrelease),stretch buster trusty xenial bionic focal groovy))
   autoconf_version =
 endif
 ifeq ($(trunk_build),yes)
@@ -342,7 +342,7 @@ endif
 ifeq ($(with_ssp)-$(with_ssp_default),yes-yes)
 	echo '#define DIST_DEFAULT_SSP 1' \
 	     >> $(srcdir)/gcc/distro-defaults.h
-  ifeq (,$(filter $(distrelease),dapper hardy lucid maverick natty oneiric precise quantal raring saucy trusty))
+  ifeq (,$(filter $(distrelease), precise trusty))
 	echo '#define DIST_DEFAULT_SSP_STRONG 1' \
 	     >> $(srcdir)/gcc/distro-defaults.h
   endif

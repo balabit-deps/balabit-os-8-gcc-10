@@ -2,7 +2,7 @@
 
 --- a/src/gcc/configure.ac
 +++ b/src/gcc/configure.ac
-@@ -840,6 +840,7 @@ AC_ARG_ENABLE(__cxa_atexit,
+@@ -871,6 +871,7 @@ AC_ARG_ENABLE(__cxa_atexit,
  [], [])
  
  # Enable C extension for decimal float if target supports it.

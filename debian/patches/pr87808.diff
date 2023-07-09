@@ -2,7 +2,7 @@
 
 --- a/src/gcc/jit/Make-lang.in
 +++ b/src/gcc/jit/Make-lang.in
-@@ -84,6 +84,9 @@ jit_OBJS = attribs.o \
+@@ -122,6 +122,9 @@ jit_OBJS = attribs.o \
  	jit/jit-spec.o \
  	gcc.o
  
@@ -22,7 +22,7 @@
  
  #include <pthread.h>
  
-@@ -2550,7 +2551,31 @@ void
+@@ -2551,7 +2552,31 @@ void
  playback::context::
  invoke_embedded_driver (const vec <char *> *argvec)
  {

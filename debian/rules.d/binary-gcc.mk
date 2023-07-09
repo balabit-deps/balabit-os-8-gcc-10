@@ -277,6 +277,18 @@ ifeq ($(with_check),yes)
 	cp -p $(buildlibdir)/libgo/libgo.sum \
 		$(d_tst)/$(docdir)/$(p_xbase)/test/
   endif
+  ifneq ($(with_common_libs),yes)
+	if [ -f libstdc++-test-summary ]; then \
+	  cp libstdc++-test-summary \
+	    $(d_tst)/$(docdir)/$(p_xbase)/libstdc++-installed-test-summary; \
+	fi
+	if [ -f $(buildlibdir)/libstdc++-v3/testsuite/libstdc++-installed.LOG ]; then \
+	  cp $(buildlibdir)/libstdc++-v3/testsuite/libstdc++-installed.LOG \
+	    $(d_tst)/$(docdir)/$(p_xbase)/test/libstdc++-installed.log; \
+	  cp $(buildlibdir)/libstdc++-v3/testsuite/libstdc++-installed.SUM \
+	    $(d_tst)/$(docdir)/$(p_xbase)/test/libstdc++-installed.sum; \
+	fi
+  endif
   ifeq (0,1)
 	cd $(builddir); \
 	for i in $(CURDIR)/$(d_tst)/$(docdir)/$(p_xbase)/test/*.sum; do \

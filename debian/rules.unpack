@@ -4,8 +4,8 @@
 # source files. It has to be deleted manually.
 
 tarballs = $(gcc_tarball)
-ifeq ($(with_offload_nvptx),yes)
-  tarballs += $(nl_nvptx_tarball)
+ifneq (,$(filter yes, $(with_offload_nvptx) $(with_offload_gcn)))
+  tarballs += $(newlib_tarball)
 endif
 ifneq (,$(m2_tarball))
   tarballs += $(m2_tarball)
@@ -178,13 +178,13 @@ endif
 	echo "$(gcc_tarball) unpacked." > $@
 
 # ---------------------------------------------------------------------------
-ifneq (,$(nl_nvptx_tarball))
-$(unpack_stamp)-$(nl_nvptx_tarball): $(nl_nvptx_tarpath) $(unpack_stamp)-$(gcc_tarball)
+ifneq (,$(newlib_tarball))
+$(unpack_stamp)-$(newlib_tarball): $(newlib_tarpath) $(unpack_stamp)-$(gcc_tarball)
 	: # unpack newlib-nvptx tarball
 	mkdir -p $(stampdir)
-	: # rm -rf $(nl_nvptx_srcdir)
-	tar -x -f $(nl_nvptx_tarpath)
-	echo "$(nl_nvptx_tarball) unpacked." > $@
+	: # rm -rf $(newlib_srcdir)
+	tar -x -f $(newlib_tarpath)
+	echo "$(newlib_tarball) unpacked." > $@
 endif
 
 # ---------------------------------------------------------------------------

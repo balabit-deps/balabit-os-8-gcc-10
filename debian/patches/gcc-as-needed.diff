@@ -3,7 +3,7 @@
 
 --- a/src/gcc/gcc.c
 +++ b/src/gcc/gcc.c
-@@ -707,8 +707,11 @@ proper position among the other output f
+@@ -709,8 +709,11 @@ proper position among the other output f
  #ifdef LIBASAN_EARLY_SPEC
  #define LIBASAN_SPEC STATIC_LIBASAN_LIBS
  #elif defined(HAVE_LD_STATIC_DYNAMIC)
@@ -17,7 +17,7 @@
  		     STATIC_LIBASAN_LIBS
  #else
  #define LIBASAN_SPEC "-lasan" STATIC_LIBASAN_LIBS
-@@ -725,8 +728,11 @@ proper position among the other output f
+@@ -727,8 +730,11 @@ proper position among the other output f
  #ifdef LIBTSAN_EARLY_SPEC
  #define LIBTSAN_SPEC STATIC_LIBTSAN_LIBS
  #elif defined(HAVE_LD_STATIC_DYNAMIC)
@@ -31,7 +31,7 @@
  		     STATIC_LIBTSAN_LIBS
  #else
  #define LIBTSAN_SPEC "-ltsan" STATIC_LIBTSAN_LIBS
-@@ -743,8 +749,11 @@ proper position among the other output f
+@@ -745,8 +751,11 @@ proper position among the other output f
  #ifdef LIBLSAN_EARLY_SPEC
  #define LIBLSAN_SPEC STATIC_LIBLSAN_LIBS
  #elif defined(HAVE_LD_STATIC_DYNAMIC)
@@ -45,7 +45,7 @@
  		     STATIC_LIBLSAN_LIBS
  #else
  #define LIBLSAN_SPEC "-llsan" STATIC_LIBLSAN_LIBS
-@@ -759,8 +768,11 @@ proper position among the other output f
+@@ -761,8 +770,11 @@ proper position among the other output f
  #define STATIC_LIBUBSAN_LIBS \
    " %{static-libubsan|static:%:include(libsanitizer.spec)%(link_libubsan)}"
  #ifdef HAVE_LD_STATIC_DYNAMIC

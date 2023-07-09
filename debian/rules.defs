@@ -61,7 +61,7 @@ DEB_HOST_GNU_TYPE	?= $(call vafilt,$(DPKG_VARS),DEB_HOST_GNU_TYPE)
 DEB_HOST_MULTIARCH	?= $(call vafilt,$(DPKG_VARS),DEB_HOST_MULTIARCH)
 
 ifeq ($(derivative),Ubuntu)
-  ifeq (,$(filter $(distrelease),dapper hardy lucid precise quantal raring saucy trusty))
+  ifeq (,$(filter $(distrelease), precise trusty))
     ifeq ($(DEB_BUILD_GNU_TYPE),i486-linux-gnu)
       DEB_BUILD_GNU_TYPE = i686-linux-gnu
     endif
@@ -70,12 +70,7 @@ ifeq ($(derivative),Ubuntu)
     endif
   endif
 else
-  ifneq (,$(filter $(distrelease),lenny etch squeeze wheezy))
-    # keep dpkg defaults
-  else ifneq (,$(filter $(distrelease),jessie))
-    ifeq ($(DEB_BUILD_GNU_TYPE),i486-linux-gnu)
-      DEB_BUILD_GNU_TYPE = i586-linux-gnu
-    endif
+  ifneq (,$(filter $(distrelease),jessie))
     ifeq ($(DEB_HOST_GNU_TYPE),i486-linux-gnu)
       DEB_HOST_GNU_TYPE	= i586-linux-gnu
     endif
@@ -172,17 +167,9 @@ export DEB_TARGET_ARCH DEB_TARGET_ARCH_ABI DEB_TARGET_ARCH_BITS \
 	DEB_TARGET_ARCH_LIBC DEB_TARGET_GNU_CPU DEB_TARGET_GNU_TYPE \
 	DEB_TARGET_GNU_SYSTEM DEB_TARGET_MULTIARCH
 
-ifeq ($(derivative),Ubuntu)
-  ifeq (,$(filter $(distrelease),dapper lucid))
-    ifeq ($(DEB_TARGET_GNU_TYPE),i486-linux-gnu)
-      DEB_TARGET_GNU_TYPE = i586-linux-gnu
-    endif
-  endif
-else
-  ifneq (,$(filter $(distrelease),stretch))
-    DEB_TARGET_GNU_TYPE := $(subst i586,i686,$(DEB_TARGET_GNU_TYPE))
-    i586_symlinks = $(if $(findstring i686,$(DEB_TARGET_GNU_TYPE)),yes)
-  endif
+ifneq (,$(filter $(distrelease),stretch))
+  DEB_TARGET_GNU_TYPE := $(subst i586,i686,$(DEB_TARGET_GNU_TYPE))
+  i586_symlinks = $(if $(findstring i686,$(DEB_TARGET_GNU_TYPE)),yes)
 endif
 
 ifeq ($(DEB_TARGET_ARCH),)
@@ -314,7 +301,7 @@ endif
 ifneq ($(trunk_build),yes)
   ifeq ($(build_type),build-native)
     ifeq (,$(DEB_STAGE))
-      ifeq (,$(filter $(distrelease),wheezy jessie stretch precise trusty xenial bionic))
+      ifeq (,$(filter $(distrelease), jessie stretch precise trusty xenial bionic))
         ifneq (,$(filter $(DEB_HOST_ARCH), amd64 i386 armhf arm64 powerpc ppc64 ppc64el s390x sparc64))
           with_bootstrap := profiled
         endif
@@ -366,6 +353,20 @@ ifneq ($(findstring gccdebug, $(DEB_BUILD_OPTIONS)),)
   DEB_BUILD_OPTIONS := $(DEB_BUILD_OPTIONS) nostrip
   export DEB_BUILD_OPTIONS
 endif
+
+ifeq ($(build_type),build-native)
+  usage_stats = yes
+  ifeq ($(derivative),Ubuntu)
+    no_usage_archs = i386
+  else ifeq ($(derivative),Debian)
+    no_usage_archs = alpha hppa ia64 m68k mipsel mips64el sh4 sparc64 x32 \
+        hurd-i386 kfreebsd-i386 kfreebsd-amd64
+  endif
+  ifneq (,$(filter $(DEB_HOST_ARCH),$(no_usage_archs)))
+    usage_stats =
+  endif
+endif
+usage_stats = disabled for release builds
 
 # -------------------------------------------------------------------
 # stage options
@@ -435,12 +436,12 @@ ifneq (,$(filter $(DEB_TARGET_ARCH), amd64 arm64 i386 ppc64 ppc64el s390x x32))
 endif
 
 ifeq ($(derivative),Ubuntu)
-  ifeq (,$(filter $(distrelease),precise trusty xenial bionic cosmic disco))
+  ifeq (,$(filter $(distrelease),precise trusty xenial bionic))
     ifneq (,$(filter $(DEB_TARGET_ARCH), amd64 arm64 i386 ppc64 ppc64el s390x x32))
       with_stack_clash := yes
     endif
   endif
-  ifeq (,$(filter $(distrelease),precise trusty xenial bionic cosmic disco))
+  ifeq (,$(filter $(distrelease),precise trusty xenial bionic))
     ifneq (,$(filter $(DEB_TARGET_ARCH), amd64 i386 x32))
       with_cf_protection := yes
     endif
@@ -455,7 +456,7 @@ ifeq ($(DEB_TARGET_ARCH),armhf)
   endif
 else
   ifeq ($(derivative)-$(DEB_TARGET_ARCH),Ubuntu-armel)
-    ifneq (,$(filter $(distrelease),lucid maverick natty oneiric precise))
+    ifneq (,$(filter $(distrelease), precise))
       with_arm_thumb := yes
     endif
   endif
@@ -487,7 +488,7 @@ endif
 ifneq (,$(filter %eabihf,$(DEB_TARGET_GNU_SYSTEM)))
   float_abi := hard
 else ifneq (,$(filter $(distribution)-$(DEB_TARGET_ARCH), Ubuntu-armel))
-  ifneq (,$(filter $(distrelease),lucid maverick natty oneiric precise))
+  ifneq (,$(filter $(distrelease), precise))
     float_abi := softfp
   else
     float_abi := soft
@@ -511,11 +512,15 @@ endif
 with_common_pkgs := yes
 # ... and some libraries, which do not change (libgcc1, libssp0).
 with_common_libs := yes
+ifeq ($(common_libs_in_control),yes)
+  with_common_libs := yes
+endif
 # XXX: should with_common_libs be "yes" only if this is the default compiler
 # version on the targeted arch?
 
+
 # build -dbg packages (with_dbg is empty when -dbg package are not built)
-ifneq (,$(filter $(distrelease),wheezy jessie stretch buster precise trusty xenial bionic cosmic disco eoan))
+ifneq (,$(filter $(distrelease), jessie stretch buster precise trusty xenial bionic))
   with_dbg = yes
 else
   ifeq ($(derivative),Ubuntu)
@@ -528,9 +533,9 @@ else
 endif
 
 # is this a multiarch-enabled build?
-ifeq (,$(filter $(distrelease),lenny etch squeeze dapper hardy jaunty karmic lucid maverick))
+#ifneq (,$(filter $(distrelease), FIXME when removing multilib))
   with_multiarch_lib := yes
-endif
+#endif
 
 ifeq ($(with_multiarch_lib),yes)
   ifneq ($(single_package),yes)
@@ -540,12 +545,10 @@ ifeq ($(with_multiarch_lib),yes)
   endif
 endif
 
-ifeq (,$(filter $(distrelease),lenny etch squeeze dapper hardy jaunty karmic lucid maverick))
-  multiarch_stage1 := yes
-endif
+multiarch_stage1 := yes
 
 MIPS_R6_ENABLED = no
-ifeq (,$(filter $(distrelease),lenny etch squeeze wheezy jessie dapper hardy jaunty karmic lucid maverick natty oneiric precise quantal raring saucy trusty utopic vivid wily xenial yakkety zesty artful))
+ifeq (,$(filter $(distrelease), jessie precise trusty xenial))
   MIPS_R6_ENABLED = yes
 endif
 
@@ -745,7 +748,7 @@ ifneq (,$(filter $(DEB_TARGET_ARCH),$(nvptx_archs)))
   offload_targets += nvptx-none
   with_offload_nvptx := yes
 endif
-ifneq (,$(filter $(distrelease),lucid precise))
+ifneq (,$(filter $(distrelease), precise))
   offload_targets :=
   with_offload_nvptx :=
 endif
@@ -767,7 +770,7 @@ with_offload_nvptx := $(call envfilt, nvptx, , , $(with_offload_nvptx))
 gcn_archs := amd64
 gcn_target_name = amdgcn-amdhsa
 
-ifneq (,$(filter $(distrelease),buster xenial bionic eoan focal groovy))
+ifneq (,$(filter $(distrelease),buster xenial bionic focal groovy))
   gcn_tools_llvm_version = 9
 else ifneq (,$(filter $(distrelease),focal groovy))
   gcn_tools_llvm_version = 11
@@ -780,7 +783,8 @@ ifneq (,$(filter $(DEB_TARGET_ARCH),$(gcn_archs)))
   offload_targets += $(gcn_target_name)
   with_offload_gcn := yes
 endif
-ifneq (,$(filter $(distrelease),lucid precise))
+# not ready for LLVM-13
+ifeq (,$(filter $(distrelease), trusty xenial bionic focal hirsute impish stretch buster bullseye))
   offload_targets :=
   with_offload_gcn :=
 endif
@@ -874,7 +878,7 @@ endif
 ifneq (,$(findstring gccgo,$(PKGSOURCE)))
   with_ada :=
 endif
-ifneq (,$(filter $(distrelease),lucid precise))
+ifneq (,$(filter $(distrelease), precise))
   with_ada :=
 endif
 with_ada := $(call envfilt, ada, , , $(with_ada))
@@ -890,7 +894,7 @@ endif
 
 ifneq ($(with_separate_gnat),yes)
   ifeq ($(with_ada),yes)
-    ifneq (,$(filter $(distrelease),squeeze lucid precise))
+    ifneq (,$(filter $(distrelease), precise))
       with_ada :=
     endif
   endif
@@ -945,7 +949,7 @@ with_cxx := $(call envfilt, c++, obj-c++, , $(with_cxx))
 
 libstdcxx_abi = new
 # backports default to the old ABI
-ifneq (,$(filter $(distrelease),squeeze wheezy jessie lucid precise trusty utopic vivid))
+ifneq (,$(filter $(distrelease), jessie precise trusty))
   libstdcxx_abi = gcc4-compatible
 endif
 
@@ -992,11 +996,8 @@ ifneq (,$(findstring gccgo, $(PKGSOURCE)))
   with_libcc1 :=
 endif
 
-go_no_cpus := avr arm hppa
+go_no_cpus := avr hppa
 go_no_cpus += m68k # See PR 79281 / PR 83314
-ifeq (,$(filter $(distrelease),lenny etch squeeze dapper hardy jaunty karmic lucid maverick natty oneiric))
-  go_no_cpus := $(filter-out arm, $(go_no_cpus))
-endif
 go_no_systems := kfreebsd
 ifneq (,$(filter $(distrelease),precise))
   go_no_archs = armhf
@@ -1411,24 +1412,24 @@ with_libvtv :=
 # pie by default --------------------
 with_pie :=
 ifeq ($(distribution),Debian)
-  ifeq (,$(filter $(distrelease),wheezy squeeze jessie))
+  ifeq (,$(filter $(distrelease), jessie))
     pie_archs = amd64 arm64 armel armhf i386 \
 		mips mipsel mips64 mips64el mipsn32 mipsn32el \
 		mipsr6 mipsr6el mips64r6 mips64r6el mipsn32r6 mipsn32r6el \
 		ppc64el s390x sparc sparc64 kfreebsd-amd64 kfreebsd-i386 \
 		hurd-i386 riscv64
   endif
-  ifeq (,$(filter $(distrelease),wheezy squeeze jessie stretch))
+  ifeq (,$(filter $(distrelease), jessie stretch))
     pie_archs += powerpc ppc64
   endif
 else ifeq ($(distribution),Ubuntu)
-  ifeq (,$(filter $(distrelease),lucid precise trusty utopic vivid wily))
+  ifeq (,$(filter $(distrelease), precise trusty))
     pie_archs = s390x
   endif
-  ifeq (,$(filter $(distrelease),lucid precise trusty utopic vivid wily xenial))
+  ifeq (,$(filter $(distrelease), precise trusty xenial))
     pie_archs += amd64 ppc64el
   endif
-  ifeq (,$(filter $(distrelease),lucid precise trusty utopic vivid wily xenial yakkety zesty))
+  ifeq (,$(filter $(distrelease), precise trusty xenial))
     pie_archs += armhf arm64 i386
   endif
   pie_archs += riscv64
@@ -1552,7 +1553,7 @@ else
     with_shared_libgcc := yes
     ifeq ($(with_common_libs),yes)
       with_libgcc := yes
-      ifneq (,$(filter $(distrelease),wheezy jessie stretch buster bullseye sid lucid precise trusty xenial bionic eoan focal))
+      ifneq (,$(filter $(distrelease), jessie stretch buster precise trusty xenial bionic focal))
         ifneq (,$(filter $(build_type), build-native cross-build-native))
           with_libcompatgcc := yes
         endif
@@ -1582,7 +1583,7 @@ else
   hppa64_no_snap := no
   hppa64_archs := hppa
   ifneq (,$(filter $(build_type), build-native cross-build-native))
-    ifneq (,$(filter $(distrelease),wheezy squeeze jessie lucid precise trusty utopic vivid wily))
+    ifneq (,$(filter $(distrelease), jessie precise trusty))
       binutils_hppa64 := binutils-hppa64
     else
       ifneq ($(single_package),yes)
@@ -1630,8 +1631,12 @@ ifneq (,$(with_rtlibs))
 endif
 #check_no_cpus := m68k
 check_no_systems := # gnu kfreebsd-gnu
+check_no_archs := # ppc64 sh4
 ifneq (,$(filter $(DEB_TARGET_ARCH_CPU),$(check_no_cpus)))
   with_check := disabled for cpu $(DEB_TARGET_ARCH_CPU)
+endif
+ifneq (,$(filter $(DEB_TARGET_ARCH),$(check_no_archs)))
+  with_check := disabled for cpu $(DEB_TARGET_ARCH)
 endif
 #ifneq (,$(findstring $(DEB_TARGET_GNU_SYSTEM),$(check_no_systems)))
 #  with_check := disabled for system $(DEB_TARGET_GNU_SYSTEM)
@@ -1653,7 +1658,7 @@ endif
 #endif
 # override the Debian porters, we need to know about the test results
 ifeq ($(distribution),Debian)
-  ifneq (,$(filter $(DEB_HOST_ARCH), m68k sh4))
+  ifneq (,$(filter $(DEB_HOST_ARCH), m68k))
     with_check := yes
   endif
 endif
@@ -1685,16 +1690,11 @@ biarch_map := i686=x86_64 powerpc=powerpc64 sparc=sparc64 sparc64=sparc s390=s39
 		mips64=mips mips64el=mipsel mipsn32=mips mipsn32el=mipsel \
 		mipsr6=mips64r6 mipsr6el=mips64r6el mips64r6=mipsr6 mips64r6el=mipsr6el \
 		mipsn32r6=mipsr6 mipsn32r6el=mipsr6el
-ifneq (,$(filter $(derivative),Ubuntu))
-  ifeq (,$(filter $(distrelease),dapper hardy jaunty karmic lucid))
-    biarch_map := $(subst i686=,i486=,$(biarch_map))
-  endif
-else # Debian
-  biarch_map := $(subst i686=,i486=,$(biarch_map))
-endif
+# FIXME: why still?
+biarch_map := $(subst i686=,i486=,$(biarch_map))
 
 ifeq ($(derivative),Ubuntu)
-  ifeq (,$(filter $(distrelease),dapper hardy jaunty karmic lucid maverick natty))
+  ifneq (,$(filter $(distrelease), precise trusty xenial bionic focal groovy hirsute))
     biarch_map += arm=arm
   endif
 endif
@@ -1847,18 +1847,15 @@ ifeq (yes,$(MIPS_R6_ENABLED))
 endif
 
 ifeq ($(derivative),Ubuntu)
-  ifeq (,$(filter $(distrelease),dapper hardy jaunty karmic lucid maverick natty artful))
+  ifneq (,$(filter $(distrelease), precise trusty xenial bionic focal groovy hirsute))
     biarchhfarchs := /armel/
     biarchsfarchs := /armhf/
   endif
-  ifeq (,$(filter $(distrelease),dapper hardy jaunty karmic lucid maverick natty oneiric precise quantal))
+  ifeq (,$(filter $(distrelease), precise))
     biarchx32archs := /amd64/i386/
   endif
-endif
-ifeq ($(derivative),Debian)
-  ifeq (,$(filter $(distrelease),etch squeeze wheezy))
-    biarchx32archs := /amd64/i386/
-  endif
+else ifeq ($(derivative),Debian)
+  biarchx32archs := /amd64/i386/
 endif
 $(foreach x,32 64 n32 x32 hf sf,$(eval $(call gen_biarch,$(x))))
 
@@ -2054,16 +2051,10 @@ gcc_tarpath		:= $(firstword $(wildcard gcc-*.tar.* /usr/src/gcc-10/gcc-*.tar.*))
 gcc_tarball		:= $(notdir $(gcc_tarpath))
 gcc_srcdir		:= $(subst -dfsg,,$(patsubst %.tar.xz,%,$(patsubst %.tar.lzma,%,$(patsubst %.tar.gz,%,$(gcc_tarball:.tar.bz2=)))))
 
-ifeq ($(with_offload_nvptx),yes)
-  nl_nvptx_tarpath	:= $(firstword $(wildcard newlib-*.tar.* /usr/src/gcc-$(BASE_VERSION)/newlib-*.tar.*))
-  nl_nvptx_tarball	:= $(notdir $(nl_nvptx_tarpath))
-  nl_nvptx_srcdir	:= $(patsubst %.tar.xz,%,$(patsubst %.tar.lzma,%,$(patsubst %.tar.gz,%,$(nl_nvptx_tarball:.tar.bz2=))))
-endif
-
-ifeq ($(with_offload_gcn),yes)
-  nl_gcn_tarpath	:= $(firstword $(wildcard newlib-*.tar.* /usr/src/gcc-$(BASE_VERSION)/newlib-*.tar.*))
-  nl_gcn_tarball	:= $(notdir $(nl_gcn_tarpath))
-  nl_gcn_srcdir	:= $(patsubst %.tar.xz,%,$(patsubst %.tar.lzma,%,$(patsubst %.tar.gz,%,$(nl_gcn_tarball:.tar.bz2=))))
+ifneq (,$(filter yes, $(with_offload_nvptx) $(with_offload_gcn)))
+  newlib_tarpath	:= $(firstword $(wildcard newlib-*.tar.* /usr/src/gcc-$(BASE_VERSION)/newlib-*.tar.*))
+  newlib_tarball	:= $(notdir $(newlib_tarpath))
+  newlib_srcdir	:= $(patsubst %.tar.xz,%,$(patsubst %.tar.lzma,%,$(patsubst %.tar.gz,%,$(newlib_tarball:.tar.bz2=))))
 endif
 
 #ifeq ($(with_m2),yes)

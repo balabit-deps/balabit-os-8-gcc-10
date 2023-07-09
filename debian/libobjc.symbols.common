@@ -197,7 +197,7 @@
  sel_getName@Base 4.6
  sel_getTypeEncoding@Base 4.6
  sel_getTypedSelector@Base 4.6
- sel_getUid@Base 4.6 
+ sel_getUid@Base 4.6
  sel_get_any_uid@Base 4.2.1
  sel_isEqual@Base 4.6
  sel_is_mapped@Base 4.2.1

@@ -1,3 +1,608 @@
+gcc-10 (10.5.0-1ubuntu1~20.04) focal-proposed; urgency=medium
+
+  * SRU: LP: #2019465. Update GCC 10 to the 10.5.0 release.
+  * Build the common shared library packages.
+  * Still use newlib 4.1.0 for the amdgcn offload build.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sun, 09 Jul 2023 08:45:30 +0200
+
+gcc-10 (10.5.0-1ubuntu1) mantic; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 07 Jul 2023 10:36:53 +0200
+
+gcc-10 (10.5.0-1) unstable; urgency=medium
+
+  * Update to the GCC 10.5.0 release.
+    - Fix PR c++/92752, PR c++/97420, PR d/110511.
+  * Update newlib to 4.3.0.
+  * Refresh patches.
+  * Fix libtsan0 build (when building the libs built by newer GCC versions).
+  * Update libgphobos symbols file.
+
+ -- Matthias Klose <doko@debian.org>  Fri, 07 Jul 2023 09:39:38 +0200
+
+gcc-10 (10.4.0-9) unstable; urgency=medium
+
+  * Update to git 20230629 from the gcc-10 branch.
+    - Fix PR target/109932 (PPC), PR target/110011 (PPC),
+      PR target/110044 (PPC), PR target/109954, PR target/70243 (PPC),
+      PR d/110359, PR fortran/96024, PR libstdc++/108118, PR libstdc++/94540,
+      PR libstdc++/106607, PR libstdc++/102447, PR libstdc++/103664,
+      PR libstdc++/84110.
+
+ -- Matthias Klose <doko@debian.org>  Thu, 29 Jun 2023 12:44:57 +0200
+
+gcc-10 (10.4.0-8ubuntu1) mantic; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 10 May 2023 11:20:20 +0200
+
+gcc-10 (10.4.0-8) unstable; urgency=medium
+
+  * Update to git 20230510 from the gcc-10 branch.
+    - Fix PR target/106736 (PPC), PR fortran/108131,
+      PR tree-optimization/109778, PR tree-optimization/109410,
+      PR middle-end/106190, PR ipa/105685, PR target/105554,
+      PR middle-end/108685, PR testsuite/108973, PR middle-end/108854,
+      PR target/108881 (x86), PR tree-optimization/108688,
+      PR middle-end/108435, PR debug/108573, PR rtl-optimization/108596,
+      PR other/108560, PR middle-end/108237, PR tree-optimization/108068,
+      PR rtl-optimization/108193, PR rtl-optimization/106751,
+      PR tree-optimization/107997, PR debug/106719, PR middle-end/107317,
+      PR target/107748 (x86), PR target/107183 (x86), PR c/107001,
+      PR debug/106261, PR middle-end/106144, PR rtl-optimization/106032,
+      PR middle-end/106030, PR target/108589 (AArch64),
+      PR target/108699 (PPC), PR target/104921 (AArch64),
+      PR target/108348 (PPC), PR target/108272 (PPC),
+      PR tree-optimization/107554, PR tree-optimization/107323,
+      PR tree-optimization/107107, PR tree-optimization/106934,
+      PR driver/106624, PR c/109151, PR c/107465, PR c/107465, PR c++/107163,
+      PR c++/107358, PR c/106981, PR preprocessor/97498, PR c++/109164,
+      PR c++/109096, PR c++/107558, PR debug/108716, PR c++/108474,
+      PR c++/108365, PR c++/108607, PR c++/53932, PR c++/108180,
+      PR c++/107065, PR c++/105774, PR c++/105996, PR c++/108975,
+      PR c++/69410, PR c++/101869, PR d/108877, PR fortran/108451,
+      PR fortran/108349, PR fortran/109511, PR fortran/109186,
+      PR fortran/85877, PR fortran/106945, PR fortran/104332,
+      PR fortran/108937, PR fortran/96024, PR fortran/96025,
+      PR fortran/95107, PR fortran/108609, PR fortran/108527,
+      PR fortran/108529, PR fortran/106209, PR fortran/108501,
+      PR fortran/108502, PR fortran/108421, PR fortran/108420,
+      PR fortran/108453, PR target/100758 (x86), PR target/108339 (RISCV),
+      PR c++/108180, PR c/106981, PR libgomp/106045, PR other/109306,
+      PR libquadmath/87204, PR libquadmath/94756, PR libstdc++/105844,
+      PR libstdc++/105844, PR libstdc++/67791, PR libstdc++/109064,
+      PR libstdc++/108952, PR libstdc++/100823, PR libstdc++/107814,
+      PR libstdc++/108636.
+  * RISC-V: jal cannot refer to a default visibility symbol for shared object,
+    taken from the GCC 12 branch.
+  * Bump standards version.
+  * Fix FTBFS on hurd-i386.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 10 May 2023 10:59:43 +0200
+
+gcc-10 (10.4.0-7ubuntu1) lunar; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 21 Feb 2023 07:31:36 +0100
+
+gcc-10 (10.4.0-8) unstable; urgency=medium
+
+  * Update to git 20230110 from the gcc-10 branch.
+    - Fix PR target/106736 (PPC), PR fortran/108131.
+  * RISC-V: jal cannot refer to a default visibility symbol for shared object,
+    taken from the GCC 12 branch.
+  * Bump standards version.
+  * Fix FTBFS on hurd-i386.
+
+ -- Matthias Klose <doko@debian.org>  Tue, 10 Jan 2023 05:34:13 +0100
+
+gcc-10 (10.4.0-6ubuntu1) lunar; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 03 Jan 2023 08:47:50 +0100
+
+gcc-10 (10.4.0-6) unstable; urgency=medium
+
+  * Update to git 20230102 from the gcc-10 branch.
+    - Fix PR target/98776 (AArch64), PR target/107863 (x86),
+      PR rtl-optimization/107482, PR tree-optimization/107485,
+      PR target/107304, PR c/41041, PR target/106355 (S390),
+      PR target/107364 (x86), PR target/107336, PR target/96072 (PPC),
+      PR target/99685 (PPC), PR lto/106540, PR lto/106334,
+      PR tree-optimization/106513, PR middle-end/106331,
+      PR tree-optimization/106131, PR tree-optimization/106112,
+      PR target/107248 (SPARC), PR target/107064 (x86),
+      PR target/106491 (AArch64), PR target/101322 (PPC), PR c++/102780,
+      PR c++/108138, PR d/108050, PR d/107592, PR d/106638, PR d/106139,
+      PR fortran/107872, PR fortran/107576, PR fortran/103413,
+      PR fortran/105633, PR fortran/106817, PR fortran/105012,
+      PR fortran/100040, PR fortran/100029, PR fortran/100132,
+      PR fortran/107054, PR fortran/82868, PR fortran/106985,
+      PR fortran/103694, PR fortran/106986, PR fortran/100245,
+      PR fortran/106857.
+  * Backport d/patches/pr91085.diff to avoid problem with fixincludes-ed
+    sys/mount.h.
+  * The fix for PR ada/103538 leads to a build failure on x32 not having
+    the dladdr linked in on x32 with older glibc version where this symbol
+    is still in libdl.so. Just link with -ldl. Fixes PR ada/107475.
+  * Update libgphobos symbols file.
+
+ -- Matthias Klose <doko@debian.org>  Mon, 02 Jan 2023 16:17:29 +0100
+
+gcc-10 (10.4.0-5ubuntu2) kinetic; urgency=medium
+
+  * Backport d/patches/pr91085.diff to avoid problem with fixincludes-ed
+    sys/mount.h.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 09 Sep 2022 00:43:46 +0200
+
+gcc-10 (10.4.0-5ubuntu1) kinetic; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 08 Sep 2022 16:13:37 +0200
+
+gcc-10 (10.4.0-5) unstable; urgency=medium
+
+  * Update to git 20220905 from the gcc-10 branch.
+    - Fix PR target/106017 (PPC), PR target/103353 (PPC),
+      PR target/103197 (PPC), PR target/102146 (PPC), PR testsuite/106345,
+      PR target/106091 (PPC), PR rtl-optimization/105041,
+      PR preprocessor/97498, PR d/106638, PR fortran/103504,
+      PR libstdc++/98421, PR libstdc++/100748, PR libstdc++/103133,
+      PR libstdc++/106162, PR libstdc++/106320.
+  * Bump standards version.
+
+ -- Matthias Klose <doko@debian.org>  Mon, 05 Sep 2022 22:00:22 +0200
+
+gcc-10 (10.4.0-4ubuntu1~22.04) jammy-proposed; urgency=medium
+
+  * SRU: LP: #1970233. Backport GCC 10.4.0 to 22.04 LTS.
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 19 Jul 2022 12:40:18 +0200
+
+gcc-10 (10.4.0-4ubuntu1) kinetic; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Tue, 19 Jul 2022 11:31:01 +0200
+
+gcc-10 (10.4.0-4) unstable; urgency=medium
+
+  * Fix the backport of the fix for PR target/102952.
+
+ -- Matthias Klose <doko@debian.org>  Tue, 19 Jul 2022 11:27:17 +0200
+
+gcc-10 (10.4.0-3) unstable; urgency=medium
+
+  * Fix applying the pr102952-doc patch.
+
+ -- Matthias Klose <doko@debian.org>  Mon, 18 Jul 2022 16:41:26 +0200
+
+gcc-10 (10.4.0-2) unstable; urgency=medium
+
+  * Update to git 20220718 from the gcc-10 branch.
+    - Fix PR tree-optimization/105860, PR d/106139, PR fortran/104313,
+      PR fortran/103137, PR fortran/103138, PR fortran/103693,
+      PR fortran/105243, PR fortran/106121, PR fortran/105954,
+      PR fortran/105691, PR fortran/105813.
+  * Backport PR target/102952, support for -mharden-sls and
+    -mindirect-branch-cs-prefix for x86, suggested by Ben Hutchings.
+    Closes: #1014851.
+
+ -- Matthias Klose <doko@debian.org>  Mon, 18 Jul 2022 09:33:00 +0200
+
+gcc-10 (10.4.0-1ubuntu1) kinetic; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 29 Jun 2022 15:36:39 +0200
+
+gcc-10 (10.4.0-1) unstable; urgency=medium
+
+  * GCC 10.4.0 release.
+  * Refresh patches.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 29 Jun 2022 14:30:05 +0200
+
+gcc-10 (10.3.0-16ubuntu1) kinetic; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 22 Jun 2022 21:25:24 +0200
+
+gcc-10 (10.3.0-16) unstable; urgency=medium
+
+  * Update to git 20220622 from the gcc-10 branch (10.3 release candidate).
+
+ -- Matthias Klose <doko@debian.org>  Wed, 22 Jun 2022 21:12:42 +0200
+
+gcc-10 (10.3.0-15ubuntu1) jammy; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 24 Mar 2022 13:12:38 +0100
+
+gcc-10 (10.3.0-15) unstable; urgency=medium
+
+  * Update to git 20220324 from the gcc-10 branch.
+    - Fix PR tree-optimization/103237, PR middle-end/103181,
+      PR middle-end/103248, PR tree-optimization/102798, PR ipa/102762,
+      PR tree-optimization/100923, PR tree-optimization/101158,
+      PR target/103627 (PPC), PR target/103627 (PPC), PR target/104469 (x86),
+      PR target/104458 (x86), PR target/104451 (x86), PR target/104090 (PPC),
+      PR middle-end/95115, PR target/102976 (PPC), PR ada/103538,
+      PR ada/103538, PR fortran/104619, PR fortran/104311, PR fortran/104331,
+      PR fortran/83079, PR fortran/104127, PR fortran/104227,
+      PR fortran/101762, PR fortran/67804, PR fortran/103782,
+      PR fortran/103692, PR fortran/102332, PR sanitizer/102911,
+      PR libstdc++/102358, PR target/87496 (PPC), PR target/104208 (PPC),
+      PR target/104453 (x86), PR tree-optimization/104511,
+      PR target/100784 (x86), PR target/104253 (PPC).
+  * Support the ld.mold linker, patch taken from the trunk.
+  * Don't enable -fcf-protection with -m16 and -m32. LP: #1940029.
+  * Don't run the tests on ppc64 and sh4, hanging on the buildds.
+
+ -- Matthias Klose <doko@debian.org>  Thu, 24 Mar 2022 13:03:07 +0100
+
+gcc-10 (10.3.0-14ubuntu1) jammy; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 13 Jan 2022 11:55:32 +0100
+
+gcc-10 (10.3.0-14) unstable; urgency=medium
+
+  * Update to git 20220113 from the gcc-10 branch.
+    - Fix PR tree-optimization/97953, PR target/103465, PR target/103661 (x86),
+      PR target/102347 (PPC), PR ipa/103267, PR target/103274 (x86),
+      PR ipa/103052, PR target/101985 (PPC), PR libfortran/103634,
+      PR d/103604, PR libstdc++/103877, PR libstdc++/103549,
+      PR libstdc++/103453, PR libstdc++/103086, PR libstdc++/101571,
+      PR libstdc++/101965, PR libstdc++/102894, PR libstdc++/102270,
+      PR libstdc++/100863, PR libstdc++/100863, PR libstdc++/65816,
+      PR libstdc++/101870, PR libstdc++/101608, PR libstdc++/103381.
+  * Remove the gdc-driver-nophobos patch.
+  * Configure instead with --with-libphobos-druntime-only=yes.
+  * Bump standards version.
+
+ -- Matthias Klose <doko@debian.org>  Thu, 13 Jan 2022 11:33:44 +0100
+
+gcc-10 (10.3.0-13ubuntu1) jammy; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 17 Nov 2021 21:16:05 +0100
+
+gcc-10 (10.3.0-13) unstable; urgency=medium
+
+  * Update to git 20211117 from the gcc-10 branch.
+    - Fix PR ipa/102714, PR middle-end/100672, PR tree-optimization/100253,
+      PR tree-optimization/102789, PR rtl-optimization/102842,
+      PR tree-optimization/102505, PR fortran/103137, PR fortran/103138,
+      PR fortran/102816, PR fortran/102685, PR fortran/102715,
+      PR fortran/102817, PR fortran/99348, PR fortran/102521,
+      PR libstdc++/103022.
+  * Move libtsan_preinit.o into libgcc-10-dev. Addresses: #999752.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 17 Nov 2021 19:08:29 +0100
+
+gcc-10 (10.3.0-12ubuntu1) jammy; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 29 Oct 2021 14:09:30 +0200
+
+gcc-10 (10.3.0-12) unstable; urgency=medium
+
+  * Update to git 20211029 from the gcc-10 branch.
+    - Fix PR target/102761 (x86), PR target/98667 (x86),
+      PR tree-optimization/102046, PR tree-optimization/101925,
+      PR tree-optimization/101373, PR tree-optimization/101868,
+      PR middle-end/101824, PR target/102588 (SPARC), PR c++/64697,
+      PR tree-optimization/102622, PR target/102107 (PPC),
+      PR target/102107 (PPC), PR c++/95520, PR c++/99617, PR d/102574,
+      PR fortran/102716, PR fortran/102458, PR fortran/102458,
+      PR fortran/82314, PR fortran/102520, PR fortran/85130,
+      PR fortran/102287, PR fortran/102366, PR libstdc++/90787,
+      PR libstdc++/100187, PR libstdc++/100237, PR libstdc++/100249,
+      PR libstdc++/100287, PR libstdc++/101599, PR libstdc++/101589,
+      PR libstdc++/101483, PR libstdc++/100387, PR libstdc++/100606,
+      PR libstdc++/102425, PR libstdc++/99876, PR libstdc++/102280,
+      PR libstdc++/102667.
+  * ARM: pass architecture extensions to assembler if supported. Backported
+    from the trunk.
+  * Stop building the gcn offload compiler, not working with LLVM-13.
+
+ -- Matthias Klose <doko@debian.org>  Fri, 29 Oct 2021 13:53:58 +0200
+
+gcc-10 (10.3.0-11ubuntu1) impish; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sun, 19 Sep 2021 10:30:36 +0200
+
+gcc-10 (10.3.0-11) unstable; urgency=medium
+
+  * Update to git 20210918 from the gcc-10 branch.
+    - Fix PR rtl-optimization/102306, PR target/97142 (PPC), PR fortran/101327,
+      PR fortran/98490, PR fortran/97612, PR fortran/98565, PR fortran/97694,
+      PR fortran/97723, PR fortran/93701, PR fortran/98472, PR fortran/100110.
+  * Fix libgcc-s1 symbols file for alpha.
+  * For armhf configure --with-arch=<arch>+fp, dropping the --with-fpu=
+    option; keep the old configure options for backports, for now only enabled
+    for future distro releases.
+
+ -- Matthias Klose <doko@debian.org>  Sun, 19 Sep 2021 10:14:37 +0200
+
+gcc-10 (10.3.0-10ubuntu1) impish; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 09 Sep 2021 18:07:35 +0200
+
+gcc-10 (10.3.0-10) unstable; urgency=medium
+
+  * Update to git 20210909 from the gcc-10 branch.
+    - Fix PR c++/60318, PR tree-optimization/101394, PR middle-end/101291,
+      PR tree-optimization/101173, PR tree-optimization/101280,
+      PR tree-optimization/101105, PR middle-end/101009, PR target/101849 (PPC).
+
+ -- Matthias Klose <doko@debian.org>  Thu, 09 Sep 2021 14:11:26 +0200
+
+gcc-10 (10.3.0-9) unstable; urgency=medium
+
+  * Update to git 20210902 from the gcc-10 branch.
+    - Fix PR fortran/46691, PR fortran/99819, PR fortran/99818,
+      PR fortran/93924, PR fortran/93925, PR fortran/93794, PR fortran/99125.
+  * Remove trailing spaces in symbols files.
+  * Fix not building the common packages on mipsen. Closes: #993470.
+  * Don't run the tests with the installed libstdc++ on slow buildds.
+
+ -- Matthias Klose <doko@debian.org>  Thu, 02 Sep 2021 12:00:51 +0200
+
+gcc-10 (10.3.0-8ubuntu1) impish; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 28 Aug 2021 15:57:52 +0200
+
+gcc-10 (10.3.0-8) unstable; urgency=high
+
+  * Update to git 20210828 from the gcc-10 branch.
+    - Fix PR target/101472 (x86), PR target/101471 (x86), PR ipa/97565,
+      PR target/102035 (ARM), PR fortran/98411.
+  * Stop building the common libs, now also built by gcc-11-mipsen.
+  * Update libgcc-s1 symbols file for sh4.
+
+ -- Matthias Klose <doko@debian.org>  Sat, 28 Aug 2021 15:50:50 +0200
+
+gcc-10 (10.3.0-7ubuntu1) impish; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 25 Aug 2021 16:08:55 +0200
+
+gcc-10 (10.3.0-7) unstable; urgency=medium
+
+  * Update to git 20210824 from the gcc-10 branch.
+    - Fix PR target/94780 (MIPS), PR c/99295, PR ipa/101066,
+      PR target/100182 (x86), PR target/101129 (PPC),
+      PR rtl-optimization/99927, PR d/96435, PR d/101640, PR d/101490,
+      PR d/101441, PR d/101127, PR d/101619, PR fortran/101514,
+      PR fortran/101536, PR fortran/101084, PR fortran/100949,
+      PR sanitizer/101749, PR libstdc++/101866, PR libstdc++/101510,
+      PR libstdc++/101510, PR libstdc++/101056, PR libstdc++/100894,
+      PR libstdc++/96657, PR libstdc++/98842, PR c++/101361,
+      PR libstdc++/101411, PR target/101723 (ARM), PR target/100767 (ARM),
+      PR target/100305 (AArch64), PR gcov-profile/100788, PR libstdc++/100139.
+  * Ada: Keep the alternate stack size at 16 * 1024, and don't rely on
+    the MINSIGSTKSZ constant removed in glibc 2.34.
+  * Don't build the lib*gccN compat packages for bullseye. This was never
+    uploaded in time for bullseye.
+  * Still build the common lib packages on architectures where gcc-11 isn't
+    explicitly built.
+
+ -- Matthias Klose <doko@debian.org>  Tue, 24 Aug 2021 15:57:22 +0200
+
+gcc-10 (10.3.0-6ubuntu3) impish; urgency=medium
+
+  * Ada: Keep the alternate stack size at 16 * 1024, and don't rely on
+    the MINSIGSTKSZ constant removed in glibc 2.34.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 14 Aug 2021 12:30:17 +0200
+
+gcc-10 (10.3.0-6ubuntu2) impish; urgency=medium
+
+  * Update to git 20210813 from the gcc-10 branch.
+    - Fix PR target/94780 (MIPS), PR c/99295, PR ipa/101066,
+      PR target/100182 (x86), PR target/101129 (PPC),
+      PR rtl-optimization/99927, PR d/96435, PR d/101640, PR d/101490,
+      PR d/101441, PR d/101127, PR d/101619, PR fortran/101514,
+      PR fortran/101536, PR fortran/101084, PR fortran/100949,
+      PR sanitizer/101749, PR libstdc++/101866, PR libstdc++/101510,
+      PR libstdc++/101510, PR libstdc++/101056, PR libstdc++/100894,
+      PR libstdc++/96657, PR libstdc++/98842, PR c++/101361,
+      PR libstdc++/101411.
+
+ -- Matthias Klose <doko@ubuntu.com>  Fri, 13 Aug 2021 14:17:26 +0200
+
+gcc-10 (10.3.0-6ubuntu1) impish; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 14 Jul 2021 11:05:01 +0200
+
+gcc-10 (10.3.0-6) experimental; urgency=medium
+
+  * Update to git 20210714 from the gcc-10 branch.
+    - Fix PR target/101175 (x86), PR target/100856 (ARM),
+      PR target/101016 (ARM), PR target/100777 (PPC), PR target/99842 (PPC),
+      PR target/100871 (S390), PR tree-optimization/100934, PR ipa/100791,
+      PR ipa/100513, PR middle-end/100509, PR tree-optimization/100492,
+      PR c++/101087, PR d/100999, PR d/100967, PR fortran/100227,
+      PR fortran/95501, PR fortran/95502, PR fortran/82376,
+      PR target/99939 (ARM), PR libstdc++/91488, PR libstdc++/100900,
+      PR libstdc++/95833, PR libstdc++/100384, PR libstdc++/99006,
+      PR libstdc++/91488, PR libstdc++/100982, PR libstdc++/101034,
+      PR libstdc++/100770, PR libstdc++/100690, PR libstdc++/100631,
+      PR libstdc++/100639.
+  * Fix -fstack-protector on musl (Helmut Grohne). Addresses: #989521.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 14 Jul 2021 10:57:49 +0200
+
+gcc-10 (10.3.0-4ubuntu1) impish; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Thu, 10 Jun 2021 10:44:57 +0200
+
+gcc-10 (10.3.0-4) experimental; urgency=medium
+
+  * Update to git 20210610 from the gcc-10 branch.
+    - Fix PR target/100333 (ARM), PR rtl-optimization/98777,
+      PR rtl-optimization/98722, PR target/97969, PR target/99725 (ARM),
+      PR target/99960 (ARM), PR target/99977 (ARM),
+      PR rtl-optimization/80960, PR tree-optimization/100566,
+      PR target/100419 (ARM), PR target/100563 (ARM), PR middle-end/100571,
+      PR target/99988 (AArch64), PR target/100108 (PPC), PR c++/100102,
+      PR c++/100797, PR c++/95719, PR c++/100489, PR c++/80456,
+      PR c++/100054, PR c++/90479, PR c++/100032, PR c++/91933,
+      PR c++/99180, PR c++/93295, PR c++/93867, PR c++/99118, PR c++/96873,
+      PR c++/41723, PR c++/52625, PR c++/92918, PR c++/96673, PR c++/99901,
+      PR c++/96311, PR c++/95870, PR c++/99201, PR c++/99643, PR c++/90664,
+      PR c++/91217, PR c++/97938, PR d/100964, PR d/100935, PR d/100882,
+      PR fortran/99839, PR fortran/98411, PR sanitizer/100379,
+      PR libstdc++/100833, PR libstdc++/100768, PR libstdc++/99453,
+      PR libstdc++/99453, PR libstdc++/100630.
+  * Run again all tests from the guality test suite on armhf.
+  * Update libasan6 symbols for riscv64 (Helmut Grohne). Closes: #989205.
+  * gcc-10-base: Breaks: gcc-8-base (<< 8.4). Closes: #984574.
+
+ -- Matthias Klose <doko@debian.org>  Thu, 10 Jun 2021 10:23:58 +0200
+
+gcc-10 (10.3.0-3ubuntu1) impish; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Mon, 10 May 2021 08:12:59 +0200
+
+gcc-10 (10.3.0-3) experimental; urgency=medium
+
+  * Update to git 20210510 from the gcc-10 branch.
+    - Fix PR target/100311 (ARM), PR target/100182 (x86),
+      PR target/99647 (ARM), PR tree-optimization/100053,
+      PR tree-optimization/99954, PR tree-optimization/99880,
+      PR rtl-optimization/96796, PR tree-optimization/96513,
+      PR rtl-optimization/100225, PR rtl-optimization/84878,
+      PR target/95646 (ARM), PR target/100402 (x86),
+      PR rtl-optimization/100263, PR tree-optimization/98786,
+      PR tree-optimization/100278, PR target/100375 (nvptx),
+      PR target/100302 (AArch64), PR rtl-optimization/100254,
+      PR debug/100255, PR rtl-optimization/100230, PR fortran/100274,
+      PR c/100450, PR target/98952 (PPC), PR target/97653 (PPC),
+      PR middle-end/98088, PR middle-end/84991, PR middle-end/84992,
+      PR middle-end/90779, PR libstdc++/95983.
+  * Add the usage-wrapper script, taken from the gcc-11 packaging.
+  * Fix running the libstdc++-v3 tests against the installed libstdc++6,
+    when the libstdc++6 package is not built from this source.
+  * Don't run some tests from the guality test suite on armhf. These fail
+    on every target, but seem to hang on the buildds occasionally on armhf.
+  * README.source: Document how to run a single test.
+  * Lower the dejagnu timeout on armhf from 600 to 300.
+  * Explicitly call autoconf2.69 where necessary.
+  * Remove packaging support for oldish backports. Last supported releases
+    are Debian 8 (jessie) and Ubuntu 12.04 LTS (precise).
+  * Don't apply the arm-multilib-soft patch when building without
+    armhf/armsf multilib packages.
+  * Fix building the gcn offload compiler without the nvptx offload compiler.
+
+ -- Matthias Klose <doko@debian.org>  Mon, 10 May 2021 08:06:27 +0200
+
+gcc-10 (10.3.0-2ubuntu2) impish; urgency=medium
+
+  * Update to git 20210501 from the gcc-10 branch.
+    - Fix PR target/100311 (ARM), PR target/100182 (x86),
+      PR target/99647 (ARM), PR tree-optimization/100053,
+      PR tree-optimization/99954, PR tree-optimization/99880,
+      PR rtl-optimization/96796, PR tree-optimization/96513.
+  * Add the usage-wrapper script, taken from the gcc-11 packaging.
+  * Fix running the libstdc++-v3 tests against the installed libstdc++6,
+    when the libstdc++6 package is not built from this source.
+  * Don't run some tests from the guality test suite on armhf. These fail
+    on every target, but seem to hang on the buildds occasionally on armhf.
+  * README.source: Document how to run a single test.
+  * Lower the dejagnu timeout on armhf from 600 to 300.
+  * Explicitly call autoconf2.69 where necessary.
+  * Remove packaging support for oldish backports. Last supported releases
+    are Debian 8 (jessie) and Ubuntu 12.04 LTS (precise).
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 01 May 2021 11:10:22 +0200
+
+gcc-10 (10.3.0-2ubuntu1) impish; urgency=medium
+
+  * Merge with Debian; remaining changes:
+    - Build from upstream sources.
+
+ -- Matthias Klose <doko@ubuntu.com>  Sat, 24 Apr 2021 08:16:29 +0200
+
+gcc-10 (10.3.0-2) experimental; urgency=medium
+
+  * Update to git 20210424 from the gcc-10 branch.
+    - Fix PR lto/99898, PR c++/97966, PR c++/97973, PR c++/99806,
+      PR c++/91416, PR c++/99831, PR c++/99331, PR c++/99176, PR c++/99120,
+      PR c++/99374, PR c++/98947, PR c++/97966, PR c++/98333, PR fortran/99817,
+      PR middle-end/84991, PR middle-end/84992, PR middle-end/90779,
+      PR libstdc++/100060, PR libstdc++/100044, PR bootstrap/99983,
+      PR libstdc++/99985, PR libstdc++/96029, PR libstdc++/96029,
+      PR libstdc++/99805, PR rtl-optimization/99929, PR target/98119 (AArch64),
+      PR tree-optimization/98736, PR target/99748 (ARM),
+      PR target/99249 (AArch64), PR rtl-optimization/97141,
+      PR rtl-optimization/98726, PR middle-end/98726, PR target/98136 (AArch64),
+      PR tree-optimization/98268, PR tree-optimization/99726,
+      PR target/99216 (AArch64), PR rtl-optimization/100148, PR target/99767,
+      PR rtl-optimization/99905, PR debug/99830, PR lto/99849,
+      PR rtl-optimization/98601, PR rtl-optimization/99863, PR c/97880,
+      PR middle-end/98088, PR target/100048 (AArch64), PR c/99990, PR c++/97051,
+      PR c++/95486, PR c++/97052, PR c++/95434, PR c++/83476, PR c++/99885,
+      PR c++/100111, PR c++/99833, PR c++/99859, PR c++/97966, PR c++/97973,
+      PR c++/99806, PR c++/91416, PR c++/99831, PR c++/99331, PR c++/99176,
+      PR c++/99120, PR c++/99374, PR d/98457, PR fortran/63797, PR fortran/99817,
+      PR debug/99830, PR jit/100096, PR target/97653, PR middle-end/98088,
+      PR sanitizer/100114, PR libstdc++/100180, PR libstdc++/97600,
+      PR libstdc++/99402, PR libstdc++/97570.
+  * Explicitly use autoconf2.69 where necessary, apparently required on
+    some experimental buildds.
+  * Fix PR sanitizer/100114, taken from the trunk.
+  * Starting with Ubuntu impish, don't build arm multilib packages.
+
+ -- Matthias Klose <doko@debian.org>  Sat, 24 Apr 2021 07:25:21 +0200
+
 gcc-10 (10.3.0-1ubuntu1~20.04) focal-proposed; urgency=medium
 
   * SRU: LP: #1930125: Update to the GCC 10.3.0 release.

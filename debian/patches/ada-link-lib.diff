@@ -75,7 +75,7 @@ Author: Matthias Klose <doko@debian.org>
          "PICFLAG_FOR_TARGET=$(PICFLAG)" \
 --- a/src/Makefile.def
 +++ b/src/Makefile.def
-@@ -373,6 +373,7 @@ dependencies = { module=all-libcpp; on=a
+@@ -374,6 +374,7 @@ dependencies = { module=all-libcpp; on=a
  
  dependencies = { module=all-fixincludes; on=all-libiberty; };
  

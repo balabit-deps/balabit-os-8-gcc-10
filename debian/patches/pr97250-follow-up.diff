@@ -3,7 +3,7 @@
 
 --- a/src/gcc/config.gcc
 +++ b/src/gcc/config.gcc
-@@ -4529,10 +4529,8 @@ case "${target}" in
+@@ -4543,10 +4543,8 @@ case "${target}" in
  					case " $x86_64_archs " in
  					*" ${val} "*)
  						# Disallow x86-64-v* for --with-cpu=/--with-tune=

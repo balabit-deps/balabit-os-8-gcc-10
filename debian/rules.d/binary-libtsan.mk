@@ -28,8 +28,7 @@ define __do_tsan
 	rm -rf $(d_l) $(d_d)
 	dh_installdirs -p$(p_l) $(usr_lib$(2))
 	$(dh_compat2) dh_movefiles -p$(p_l) \
-		$(usr_lib$(2))/libtsan.so.* \
-		$(usr_lib$(2))/libtsan_preinit.o
+		$(usr_lib$(2))/libtsan.so.*
 
 	debian/dh_doclink -p$(p_l) $(p_lbase)
 	$(if $(with_dbg),debian/dh_doclink -p$(p_d) $(p_lbase))

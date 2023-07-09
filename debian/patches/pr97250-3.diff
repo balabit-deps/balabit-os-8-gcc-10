@@ -56,7 +56,7 @@
  
  # Additional x86 processors supported by --with-cpu=.  Each processor
  # MUST be separated by exactly one space.
-@@ -4527,6 +4528,17 @@ case "${target}" in
+@@ -4541,6 +4542,17 @@ case "${target}" in
  				if test x${val} != x; then
  					case " $x86_64_archs " in
  					*" ${val} "*)

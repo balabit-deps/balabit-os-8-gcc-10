@@ -2,7 +2,7 @@
 
 --- a/src/gcc/config/arm/arm.c
 +++ b/src/gcc/config/arm/arm.c
-@@ -28140,14 +28140,11 @@ arm_file_start (void)
+@@ -28209,14 +28209,11 @@ arm_file_start (void)
        if (print_tune_info)
  	arm_print_tune_info ();
  

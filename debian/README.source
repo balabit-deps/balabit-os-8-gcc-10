@@ -11,6 +11,19 @@ debian/rules.patch "debian_patches" variable, configure scripts are
 regenerated in the `patch' target. The gcc source is unpacked under
 src/ this needs to be reflected in the patch header.
 
-The source packages gdc-x.y and gnat-x.y do not contain copies of the
-source code but build-depend on the appropriate gcc-x.y-source package
-instead.
+Running a single dejagnu test
+-----------------------------
+
+ - Find out the test suite containing the test, and the associated
+   target (e.g. check-gcc in <build>/gcc, or check in <buildlibdir>/<lib>.
+
+ - Find out the dejagnu test suite, e.g. guality.exp
+   - If you have a log of the original testsuite run, search back for the
+     .exp file before the fail.
+   - Find the directory with the test and then the .exp in the nearest
+     enclosing directory.
+
+ - Set RUNTESTFLAGS to the testsuite name and the test name to run, e.g
+     RUNTESTFLAGS="guality.exp=pr54519-2.c" make -e check-gcc
+   The test name is just the base name, but might be the path relative
+   from gcc/testsuite for C++ tests.
